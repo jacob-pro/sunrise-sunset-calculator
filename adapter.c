@@ -97,7 +97,7 @@ SSCalculationStatus SunriseSunsetAroundTime(double lat, double lon, time_t atTim
 #ifdef TEST_ADAPTER
 
 #include "tinytest/tinytest.h"
-#include "test_util.h"
+#include "time_util.h"
 
 static SunriseSunsetResult result;
 
