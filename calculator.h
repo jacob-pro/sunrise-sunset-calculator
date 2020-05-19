@@ -9,31 +9,30 @@
 #ifndef CALCULATOR_H
 #define CALCULATOR_H
 
- // Time is UTC
 typedef struct {
 	int year;
 	int month;
 	int day;
 	int hours;
 	int mins;
-} SSDateTime;
+} SSCDateTimeUTC;
 
 typedef enum {
-	SSCalculationStatusSuccess,
-	SSCalculationStatusInvalidCoords,
-	SSCalculationStatusInvalidDate,
-	SSCalculationStatusYearUnsupported,
-} SSCalculationStatus;
+	SSCStatusSuccess,
+	SSCStatusInvalidCoords,
+	SSCStatusInvalidDate,
+	SSCStatusYearUnsupported,
+} SSCStatus;
 
 // Notes on accuracy:
 // +- 1 mins where latitude <= 72
 // +- 10 mins where latitude > 72
 // Lattitudes between 89 and 90 will be treated as 89
 
-// All dates are on the Gregorian calendar
+// All dates are on the Gregorian calendar UTC
 // Years must be within the range of -1000 and +3000 C.E.
 // Latitude is N, Longitude is E
-// Confirm that SSCalculationStatusSuccess is returned before using dates.
-SSCalculationStatus CalculateSunriseSunset(int year, int month, int day, double latitude, double longitude, SSDateTime *rise, SSDateTime *set);
+// Confirm that SSCStatusSuccess is returned before using dates.
+SSCStatus ssc_calculate(int year, int month, int day, double latitude, double longitude, SSCDateTimeUTC *rise, SSCDateTimeUTC *set);
 
 #endif

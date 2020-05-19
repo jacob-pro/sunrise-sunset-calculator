@@ -14,27 +14,27 @@ typedef enum {
 	SolarEventSunset,
 } SolarEvent;
 
-double radToDeg(double angleRad) {
+static double radToDeg(double angleRad) {
 	return (180.0 * angleRad / M_PI);
 }
 
-double degToRad(double angleDeg) {
+static double degToRad(double angleDeg) {
 	return (M_PI * angleDeg / 180.0);
 }
 
-bool isGregorianLeapYear(int yr) {
+static bool isGregorianLeapYear(int yr) {
 	return ((yr % 4 == 0 && yr % 100 != 0) || yr % 400 == 0);
 }
 
 // AA - Page 65 - Day of the Year
-int calcDayOfYear(int mn, int dy, bool lpyr) {
+static int calcDayOfYear(int mn, int dy, bool lpyr) {
 	int k = lpyr ? 1 : 2;
 	int n = floor((275 * mn) / 9) - k * floor((mn + 9) / 12) + dy - 30;
 	return n;
 }
 
 // AA - Page 59 - Calulation of the JD
-double calcJDfromGregorianDate(int Y, int M, int D) {
+static double calcJDfromGregorianDate(int Y, int M, int D) {
 	if (M <= 2) {
 		Y -= 1;
 		M += 12;
@@ -45,34 +45,34 @@ double calcJDfromGregorianDate(int Y, int M, int D) {
 	return JD;
 }
 
-double calcTimeJulianCent(double jd) {
+static double calcTimeJulianCent(double jd) {
 	double T = (jd - 2451545.0) / 36525.0;
 	return T;
 }
 
-double calcJDFromJulianCent(double t) {
+static double calcJDFromJulianCent(double t) {
 	double JD = t * 36525.0 + 2451545.0;
 	return JD;
 }
 
-double calcGeomMeanLongSun(double t) {
+static double calcGeomMeanLongSun(double t) {
 	double L0 = 280.46646 + t * (36000.76983 + 0.0003032 * t);
 	while (L0 > 360.0) L0 -= 360.0;
 	while (L0 < 0.0) L0 += 360.0;
 	return L0;		// in degrees
 }
 
-double calcGeomMeanAnomalySun(double t) {
+static double calcGeomMeanAnomalySun(double t) {
 	double M = 357.52911 + t * (35999.05029 - 0.0001537 * t);
 	return M;		// in degrees
 }
 
-double calcEccentricityEarthOrbit(double t) {
+static double calcEccentricityEarthOrbit(double t) {
 	double e = 0.016708634 - t * (0.000042037 + 0.0000001267 * t);
 	return e;
 }
 
-double calcSunEqOfCenter(double t) {
+static double calcSunEqOfCenter(double t) {
 	double m = calcGeomMeanAnomalySun(t);
 	double mrad = degToRad(m);
 	double sinm = sin(mrad);
@@ -82,34 +82,34 @@ double calcSunEqOfCenter(double t) {
 	return C;		// in degrees
 }
 
-double calcSunTrueLong(double t) {
+static double calcSunTrueLong(double t) {
 	double l0 = calcGeomMeanLongSun(t);
 	double c = calcSunEqOfCenter(t);
 	double O = l0 + c;
 	return O;		// in degrees
 }
 
-double calcSunApparentLong(double t) {
+static double calcSunApparentLong(double t) {
 	double o = calcSunTrueLong(t);
 	double omega = 125.04 - 1934.136 * t;
 	double lambda = o - 0.00569 - 0.00478 * sin(degToRad(omega));
 	return lambda;		// in degrees
 }
 
-double calcMeanObliquityOfEcliptic(double t) {
+static double calcMeanObliquityOfEcliptic(double t) {
 	double seconds = 21.448 - t * (46.8150 + t * (0.00059 - t * (0.001813)));
 	double e0 = 23.0 + (26.0 + (seconds / 60.0)) / 60.0;
 	return e0;		// in degrees
 }
 
-double calcObliquityCorrection(double t) {
+static double calcObliquityCorrection(double t) {
 	double e0 = calcMeanObliquityOfEcliptic(t);
 	double omega = 125.04 - 1934.136 * t;
 	double e = e0 + 0.00256 * cos(degToRad(omega));
 	return e;		// in degrees
 }
 
-double calcSunDeclination(double t) {
+static double calcSunDeclination(double t) {
 	double e = calcObliquityCorrection(t);
 	double lambda = calcSunApparentLong(t);
 	double sint = sin(degToRad(e)) * sin(degToRad(lambda));
@@ -117,7 +117,7 @@ double calcSunDeclination(double t) {
 	return theta;		// in degrees
 }
 
-double calcEquationOfTime(double t) {
+static double calcEquationOfTime(double t) {
 	double epsilon = calcObliquityCorrection(t);
 	double l0 = calcGeomMeanLongSun(t);
 	double e = calcEccentricityEarthOrbit(t);
@@ -138,7 +138,7 @@ double calcEquationOfTime(double t) {
 	return radToDeg(Etime)*4.0;	// in minutes of time
 }
 
-double calcHourAngle(SolarEvent event, double lat, double solarDec) {
+static double calcHourAngle(SolarEvent event, double lat, double solarDec) {
 	double latRad = degToRad(lat);
 	double sdRad = degToRad(solarDec);
 	double HA = (acos(cos(degToRad(90.833)) / (cos(latRad)*cos(sdRad)) - tan(latRad) * tan(sdRad)));
@@ -146,7 +146,7 @@ double calcHourAngle(SolarEvent event, double lat, double solarDec) {
 	return HA;		// in radians
 }
 
-double calcSolNoonUTC(double t, double longitude) {
+static double calcSolNoonUTC(double t, double longitude) {
 	// First pass uses approximate solar noon to calculate eqtime
 	double tnoon = calcTimeJulianCent(calcJDFromJulianCent(t) - longitude / 360.0);
 	double eqTime = calcEquationOfTime(tnoon);
@@ -160,7 +160,7 @@ double calcSolNoonUTC(double t, double longitude) {
 	return solNoonUTC;
 }
 
-double calcSunriseSetUTC(SolarEvent event, double JD, double latitude, double longitude) {
+static double calcSunriseSetUTC(SolarEvent event, double JD, double latitude, double longitude) {
 	double t = calcTimeJulianCent(JD);
 
 	// *** Find the time of solar noon at the location, and use
@@ -193,7 +193,7 @@ double calcSunriseSetUTC(SolarEvent event, double JD, double latitude, double lo
 	return timeUTC;
 }
 
-double calcJDofNearestRiseSet(bool forwards, SolarEvent event, double JD, double latitude, double longitude) {
+static double calcJDofNearestRiseSet(bool forwards, SolarEvent event, double JD, double latitude, double longitude) {
 	double julianday = JD;
 	double increment = (forwards == true) ? 1.0 : -1.0;
 	double time = calcSunriseSetUTC(event, julianday, latitude, longitude);
@@ -205,7 +205,7 @@ double calcJDofNearestRiseSet(bool forwards, SolarEvent event, double JD, double
 }
 
 //// AA - Page 63 - Calculation of the Calendar Date from the JD
-//void calcGregorianDateFromJD(double jd, int *dayPtr, int *monthPtr, int *yearPtr) {
+//static void calcGregorianDateFromJD(double jd, int *dayPtr, int *monthPtr, int *yearPtr) {
 //	jd += 0.5;
 //	int Z = floor(jd);
 //	double F = jd - Z;
@@ -234,7 +234,7 @@ double calcJDofNearestRiseSet(bool forwards, SolarEvent event, double JD, double
 
 // From https://quasar.as.utexas.edu/BillInfo/JulianDatesG.html
 // It apparently isn't supposed to work prior to 400, yet it does
-void calcGregorianDateFromJD(double JD, int *dayPtr, int *monthPtr, int *yearPtr) {
+static void calcGregorianDateFromJD(double JD, int *dayPtr, int *monthPtr, int *yearPtr) {
 	double Q = JD + 0.5;
 	int Z = floor(Q);
 	int W = (Z - 1867216.25) / 36524.25;
@@ -255,7 +255,7 @@ void calcGregorianDateFromJD(double JD, int *dayPtr, int *monthPtr, int *yearPtr
 }
 
 // Convert the minutes of sunrise/sunset for a JD to a calendar date and time
-void populate_date_time(double minutes, double JD, SSDateTime *date) {
+static void populate_date_time(double minutes, double JD, SSCDateTimeUTC *date) {
 	double julianday = JD;
 	double floatHour = minutes / 60.0;
 	int hour = floor(floatHour);
@@ -286,7 +286,7 @@ void populate_date_time(double minutes, double JD, SSDateTime *date) {
 	calcGregorianDateFromJD(julianday, &date->day, &date->month, &date->year);
 }
 
-void calculate_time_for_event(SolarEvent event, double JD, int doy, double latitude, double longitude, SSDateTime *result) {
+static void calculate_time_for_event(SolarEvent event, double JD, int doy, double latitude, double longitude, SSCDateTimeUTC *result) {
 
 	double riseTimeGMT = calcSunriseSetUTC(event, JD, latitude, longitude);
 	if (!isnan(riseTimeGMT)) {
@@ -306,18 +306,18 @@ void calculate_time_for_event(SolarEvent event, double JD, int doy, double latit
 }
 
 // Check the latitude and longitude values are valid
-bool validate_coordinates(double latitude, double longitude) {
+static bool validate_coordinates(double latitude, double longitude) {
 	if (latitude < -90 || latitude > 90) return false;
 	if (longitude < -180 || longitude > 180) return false;
 	return true;
 }
 
-bool validate_year_range(int year) {
+static bool validate_year_range(int year) {
 	return (year >= -1000 && year <= 3000);
 }
 
 // Check that the date is valid
-bool validate_gregorian_date(int year, int month, int day) {
+static bool validate_gregorian_date(int year, int month, int day) {
 	if (month < 1 || month > 12) return false;
 	if (day < 1) return false;
 	static int const monthLengths[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
@@ -327,11 +327,11 @@ bool validate_gregorian_date(int year, int month, int day) {
 	return true;
 }
 
-SSCalculationStatus CalculateSunriseSunset(int year, int month, int day, double latitude, double longitude, SSDateTime *rise, SSDateTime *set) {
+SSCStatus ssc_calculate(int year, int month, int day, double latitude, double longitude, SSCDateTimeUTC *rise, SSCDateTimeUTC *set) {
 
-	if (!validate_coordinates(latitude, longitude)) return SSCalculationStatusInvalidCoords;
-	if (!validate_gregorian_date(year, month, day)) return SSCalculationStatusInvalidDate;
-	if (!validate_year_range(year)) return SSCalculationStatusYearUnsupported;
+	if (!validate_coordinates(latitude, longitude)) return SSCStatusInvalidCoords;
+	if (!validate_gregorian_date(year, month, day)) return SSCStatusInvalidDate;
+	if (!validate_year_range(year)) return SSCStatusYearUnsupported;
 
 	if (latitude < -89) latitude = -89;		//All latitudes between 89 and 90 S will be set to -89
 	if (latitude > 89) latitude = 89;		//All latitudes between 89 and 90 N will be set to 89
@@ -342,7 +342,7 @@ SSCalculationStatus CalculateSunriseSunset(int year, int month, int day, double 
 	calculate_time_for_event(SolarEventSunrise, JD, doy, latitude, longitude, rise);
 	calculate_time_for_event(SolarEventSunset, JD, doy, latitude, longitude, set);
 
-	return SSCalculationStatusSuccess;
+	return SSCStatusSuccess;
 }
 
 
@@ -350,7 +350,7 @@ SSCalculationStatus CalculateSunriseSunset(int year, int month, int day, double 
 
 #include "tinytest/tinytest.h"
 
-static SSDateTime rise, set;
+static SSCDateTimeUTC rise, set;
 static int year, month, day;
 
 #define ASSERT_DATE_TIME_EQUAL(Y, Mo, D, H, Mi, dt) \
@@ -370,10 +370,10 @@ static int year, month, day;
 #define BRISTOL_LON -2.5879
 
 void test_bristol() {
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(2018, 11, 18, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(2018, 11, 18, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
     ASSERT_DATE_TIME_EQUAL(2018, 11, 18, 7, 33, rise);		//Test 2018 Winter
     ASSERT_DATE_TIME_EQUAL(2018, 11, 18, 16, 17, set);
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(2018, 6, 1, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(2018, 6, 1, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
     ASSERT_DATE_TIME_EQUAL(2018, 6, 1, 3, 59, rise);		//Test 2018 Summer
     ASSERT_DATE_TIME_EQUAL(2018, 6, 1, 20, 18, set);
 }
@@ -385,13 +385,13 @@ void test_bristol() {
 #define VANCOUVER_LON -123.117
 
 void test_different_timezones() {
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(2020, 2, 15, TOKYO_LAT, TOKYO_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(2020, 2, 15, TOKYO_LAT, TOKYO_LON, &rise, &set));
     ASSERT_DATE_TIME_EQUAL(2020, 2, 14, 21, 29, rise);
     ASSERT_DATE_TIME_EQUAL(2020, 2, 15, 8, 22, set);
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(2010, 9, 1, TOKYO_LAT, TOKYO_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(2010, 9, 1, TOKYO_LAT, TOKYO_LON, &rise, &set));
     ASSERT_DATE_TIME_EQUAL(2010, 8, 31, 20, 12, rise);
     ASSERT_DATE_TIME_EQUAL(2010, 9, 1, 9, 9, set);
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(1980, 5, 31, VANCOUVER_LAT, VANCOUVER_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(1980, 5, 31, VANCOUVER_LAT, VANCOUVER_LON, &rise, &set));
     ASSERT_DATE_TIME_EQUAL(1980, 5, 31, 12, 12, rise);
     ASSERT_DATE_TIME_EQUAL(1980, 6, 1, 4, 9, set);
 }
@@ -399,7 +399,7 @@ void test_different_timezones() {
 // Test some ancient dates
 
 void test_old_dates() {
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(1582, 10, 15, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(1582, 10, 15, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
     ASSERT_DATE_TIME_EQUAL(1582, 10, 15, 6, 34, rise);
     ASSERT_DATE_TIME_EQUAL(1582, 10, 15, 17, 18, set);
 
@@ -448,16 +448,16 @@ void test_old_dates() {
 #define MCMURDO_LON 166.666664
 
 void test_big_latitudes() {
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(2018, 7, 1, SVALBARD_LAT, SVALBARD_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(2018, 7, 1, SVALBARD_LAT, SVALBARD_LON, &rise, &set));
     ASSERT_DATE_TIME_EQUAL(2018, 4, 15, 0, 2, rise);		//The the Svalbard Summer
     ASSERT_DATE_TIME_EQUAL(2018, 8, 27, 21, 56, set);
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(2018, 10, 31, SVALBARD_LAT, SVALBARD_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(2018, 10, 31, SVALBARD_LAT, SVALBARD_LON, &rise, &set));
     ASSERT_DATE_TIME_EQUAL(2018, 10, 24, 10, 51, set);		//The the Svalbard Winter
     ASSERT_DATE_TIME_EQUAL(2019, 2, 18, 10, 25, rise);
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(1950, 5, 1, MCMURDO_LAT, MCMURDO_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(1950, 5, 1, MCMURDO_LAT, MCMURDO_LON, &rise, &set));
     ASSERT_DATE_TIME_EQUAL(1950, 4, 25, 1, 9, set);		//The the Antarctic Winter
     ASSERT_DATE_TIME_EQUAL(1950, 8, 20, 0, 8, rise);
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(1950, 12, 10, MCMURDO_LAT, MCMURDO_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(1950, 12, 10, MCMURDO_LAT, MCMURDO_LON, &rise, &set));
     ASSERT_DATE_TIME_EQUAL(1950, 10, 22, 13, 33, rise);		//The the Antarctic Summer
     ASSERT_DATE_TIME_EQUAL(1951, 2, 20, 12, 23, set);
 }
@@ -466,32 +466,32 @@ void test_big_latitudes() {
 
 void test_validation_calendar() {
     //Number of months
-    ASSERT_EQUALS(SSCalculationStatusInvalidDate, CalculateSunriseSunset(2018, 0, 1, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(2018, 6, 1, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
-    ASSERT_EQUALS(SSCalculationStatusInvalidDate, CalculateSunriseSunset(2018, 13, 1, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusInvalidDate, ssc_calculate(2018, 0, 1, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(2018, 6, 1, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusInvalidDate, ssc_calculate(2018, 13, 1, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
     //Month length
-    ASSERT_EQUALS(SSCalculationStatusInvalidDate, CalculateSunriseSunset(2018, 1, 0, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusInvalidDate, ssc_calculate(2018, 1, 0, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
     //Jan Length
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(2018, 1, 31, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
-    ASSERT_EQUALS(SSCalculationStatusInvalidDate, CalculateSunriseSunset(2018, 1, 32, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(2018, 1, 31, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusInvalidDate, ssc_calculate(2018, 1, 32, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
     //Nov Length
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(2018, 11, 30, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
-    ASSERT_EQUALS(SSCalculationStatusInvalidDate, CalculateSunriseSunset(2018, 11, 31, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(2018, 11, 30, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusInvalidDate, ssc_calculate(2018, 11, 31, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
     //February length
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(2016, 2, 29, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
-    ASSERT_EQUALS(SSCalculationStatusInvalidDate, CalculateSunriseSunset(2018, 2, 29, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(2016, 2, 29, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusInvalidDate, ssc_calculate(2018, 2, 29, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
     //Year validity
-    ASSERT_EQUALS(SSCalculationStatusYearUnsupported, CalculateSunriseSunset(-1001, 1, 1, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(1000, 1, 1, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
-    ASSERT_EQUALS(SSCalculationStatusYearUnsupported, CalculateSunriseSunset(3001, 1, 1, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(3000, 1, 1, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusYearUnsupported, ssc_calculate(-1001, 1, 1, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(1000, 1, 1, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusYearUnsupported, ssc_calculate(3001, 1, 1, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(3000, 1, 1, BRISTOL_LAT, BRISTOL_LON, &rise, &set));
 }
 
 void test_validation_coords() {
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(2018, 6, 1, 90, 180, &rise, &set));
-    ASSERT_EQUALS(SSCalculationStatusSuccess, CalculateSunriseSunset(2018, 6, 1, -90, -180, &rise, &set));
-    ASSERT_EQUALS(SSCalculationStatusInvalidCoords, CalculateSunriseSunset(2018, 6, 1, 91, 181, &rise, &set));
-    ASSERT_EQUALS(SSCalculationStatusInvalidCoords, CalculateSunriseSunset(2018, 6, 1, -91, -181, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(2018, 6, 1, 90, 180, &rise, &set));
+    ASSERT_EQUALS(SSCStatusSuccess, ssc_calculate(2018, 6, 1, -90, -180, &rise, &set));
+    ASSERT_EQUALS(SSCStatusInvalidCoords, ssc_calculate(2018, 6, 1, 91, 181, &rise, &set));
+    ASSERT_EQUALS(SSCStatusInvalidCoords, ssc_calculate(2018, 6, 1, -91, -181, &rise, &set));
 }
 
 int main() {

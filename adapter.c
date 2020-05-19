@@ -7,10 +7,10 @@
 #include "gmtime.h"
 
 #define calculate_sunrise_sunset_tm(time,lat,lon,rise,set)  \
-        CalculateSunriseSunset((time.tm_year + 1900), (time.tm_mon + 1), time.tm_mday, lat, lon, rise, set)
+        ssc_calculate((time.tm_year + 1900), (time.tm_mon + 1), time.tm_mday, lat, lon, rise, set)
 
 // Convert the UTC date and time result from the sunrise sunset calculator to a time_t
-time_t ssdatetime_to_time_t(SSDateTime *date) {
+static time_t ssdatetime_to_time_t(SSCDateTimeUTC *date) {
 	struct tm tmstr;
 	tmstr.tm_year = date->year - 1900;
 	tmstr.tm_mon = date->month - 1;
@@ -22,24 +22,24 @@ time_t ssdatetime_to_time_t(SSDateTime *date) {
 }
 
 // Increment/decrement the day of a struct tm 
-void change_tm_date(struct tm *time, int amount) {
+static void change_tm_date(struct tm *time, int amount) {
 	time->tm_mday += amount;
 	mktime(time);
 }
 
 #define CALCULATION() \
  status = calculate_sunrise_sunset_tm(atTimeTM, lat, lon, &rise, &set); \
- if(status != SSCalculationStatusSuccess) return status; \
+ if(status != SSCStatusSuccess) return status; \
  riset = ssdatetime_to_time_t(&rise); \
  sett = ssdatetime_to_time_t(&set);
 
-SSCalculationStatus SunriseSunsetAroundTime(double lat, double lon, time_t atTime, SunriseSunsetResult *result) {
+SSCStatus ssc_around_time(double lat, double lon, time_t atTime, SSCAroundTimeResult *result) {
 	result->time = atTime;
 	struct tm atTimeTM;
 	gmtime_r(&atTime, &atTimeTM);		//Convert the atTime to a struct UTC, for use in the calculator
-	SSDateTime rise, set;
+	SSCDateTimeUTC rise, set;
 	time_t riset, sett;
-	SSCalculationStatus status;
+	SSCStatus status;
 	CALCULATION();
 
 	if (riset < sett) {
@@ -91,7 +91,7 @@ SSCalculationStatus SunriseSunsetAroundTime(double lat, double lon, time_t atTim
 		}
 	}
 
-	return SSCalculationStatusSuccess;
+	return SSCStatusSuccess;
 }
 
 #ifdef TEST_ADAPTER
@@ -99,7 +99,7 @@ SSCalculationStatus SunriseSunsetAroundTime(double lat, double lon, time_t atTim
 #include "tinytest/tinytest.h"
 #include "time_util.h"
 
-static SunriseSunsetResult result;
+static SSCAroundTimeResult result;
 
 #define ASSERT_VALID_RESULT(r, s, v) \
 	ASSERT_EQUALS(r, result.rise); \
@@ -114,19 +114,19 @@ void test_bristol() {
 	time_t set18 = time_t_for_time(2018, 11, 18, 16, 17, 0);	// 16:17 Sunset
 	time_t early19 = time_t_for_time(2018, 11, 19, 5, 30, 0);	// 5:30 Early morning
 	time_t rise19 = time_t_for_time(2018, 11, 19, 7, 35, 0);		// 7:35 Sunrise
-	ASSERT_EQUALS(SSCalculationStatusSuccess, SunriseSunsetAroundTime(BRISTOL_LAT, BRISTOL_LON, early19, &result));
+	ASSERT_EQUALS(SSCStatusSuccess, ssc_around_time(BRISTOL_LAT, BRISTOL_LON, early19, &result));
 	ASSERT_VALID_RESULT(rise19, set18, false);
 
 	//In the middle of Monday 18th, Sun is visible. It should have risen at 7:35 and be due to set at 16:16
 	time_t midday19 = time_t_for_time(2018, 11, 19, 12, 0, 0);		// 12:00 Midday
 	time_t set19 = time_t_for_time(2018, 11, 19, 16, 16, 0);		// 16:16 Sunset
-	ASSERT_EQUALS(SSCalculationStatusSuccess, SunriseSunsetAroundTime(BRISTOL_LAT, BRISTOL_LON, midday19, &result));
+	ASSERT_EQUALS(SSCStatusSuccess, ssc_around_time(BRISTOL_LAT, BRISTOL_LON, midday19, &result));
 	ASSERT_VALID_RESULT(rise19, set19, true);
 
 	//In the evening of Monday 18th, Sun is not visible. It should have set at 16:16 and be due to rise tomorrow at 7:36
 	time_t late19 = time_t_for_time(2018, 11, 19, 20, 25, 30);	// 20:25 Evening
 	time_t rise20 = time_t_for_time(2018, 11, 20, 7, 36, 0);		// 7:36 Sunrise
-	ASSERT_EQUALS(SSCalculationStatusSuccess, SunriseSunsetAroundTime(BRISTOL_LAT, BRISTOL_LON, late19, &result));
+	ASSERT_EQUALS(SSCStatusSuccess, ssc_around_time(BRISTOL_LAT, BRISTOL_LON, late19, &result));
 	ASSERT_VALID_RESULT(rise20, set19, false);
 }
 
