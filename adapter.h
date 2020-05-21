@@ -11,10 +11,10 @@
 #include "calculator.h"
 
 typedef struct {
-	time_t time;	// Time of result
-	bool visible;	// If sun is visible
-	time_t rise;	// The next/previous rise
-	time_t set;		// The next/previous set
+    time_t time;    // Time of result
+    bool visible;    // If sun is visible
+    time_t rise;    // The next/previous rise
+    time_t set;        // The next/previous set
 } SSCAroundTimeResult;
 
 // For a given time calculate if the sun is visible, and the next/previous sunrise and sunset

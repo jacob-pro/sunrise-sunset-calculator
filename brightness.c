@@ -4,7 +4,9 @@
 //  Created by Jacob Halsey on 14/11/2018.
 //
 #include "brightness.h"
+
 #define _USE_MATH_DEFINES
+
 #include <math.h>
 #include <assert.h>
 #include <stdbool.h>
@@ -20,66 +22,70 @@
  * @param brightnessPtr - brightness result
  * @param expiryPtr - expiry result
  */
-static void sine_curve(time_t x, time_t transition, time_t event, bool decreasing, float low, float high, float refresh_diff, float *brightnessPtr, time_t *expiryPtr) {
+static void
+sine_curve(time_t x, time_t transition, time_t event, bool decreasing, float low, float high, float refresh_diff,
+           float *brightnessPtr, time_t *expiryPtr) {
 
-	// We need to transform the sine function
-	double Ymultiplier = (high - low) / 2.0;	//scale height to the difference between min and max brightness
-	double Yoffset = Ymultiplier + low;		//shift upwards to the midpoint brightness
-	double Xmultiplier = M_PI / transition;		//scale half a cycle to be equal to the transition time
-	if (decreasing) Xmultiplier = -Xmultiplier;	//flip the curve for to make it a decreasing function
-	time_t Xoffset = x - event;			//shift rightwards to centre on the sunrise/sunset event
-	double brightness = (Ymultiplier * sin(Xmultiplier * Xoffset)) + Yoffset;
+    // We need to transform the sine function
+    double Ymultiplier = (high - low) / 2.0;    //scale height to the difference between min and max brightness
+    double Yoffset = Ymultiplier + low;        //shift upwards to the midpoint brightness
+    double Xmultiplier = M_PI / transition;        //scale half a cycle to be equal to the transition time
+    if (decreasing) Xmultiplier = -Xmultiplier;    //flip the curve for to make it a decreasing function
+    time_t Xoffset = x - event;            //shift rightwards to centre on the sunrise/sunset event
+    double brightness = (Ymultiplier * sin(Xmultiplier * Xoffset)) + Yoffset;
 
-	//Work out the expiry time
-	time_t expiry;
-	if (decreasing) refresh_diff = -refresh_diff;
-	double nextUpdateBrightness = brightness + refresh_diff;
-	if (nextUpdateBrightness > high) nextUpdateBrightness = high;
-	else if (nextUpdateBrightness < low) nextUpdateBrightness = low;
-	if (x == event) {
-		expiry = x + 1;		//don't get stuck into an infinite loop when on the boundary
-	} else {
-		//inverse the sine function at nextUpdateBrightness
-		double offsetExpiry = asin((nextUpdateBrightness - Yoffset) / Ymultiplier) / Xmultiplier;
-		expiry = offsetExpiry + event;
-	}
+    //Work out the expiry time
+    time_t expiry;
+    if (decreasing) refresh_diff = -refresh_diff;
+    double nextUpdateBrightness = brightness + refresh_diff;
+    if (nextUpdateBrightness > high) nextUpdateBrightness = high;
+    else if (nextUpdateBrightness < low) nextUpdateBrightness = low;
+    if (x == event) {
+        expiry = x + 1;        //don't get stuck into an infinite loop when on the boundary
+    } else {
+        //inverse the sine function at nextUpdateBrightness
+        double offsetExpiry = asin((nextUpdateBrightness - Yoffset) / Ymultiplier) / Xmultiplier;
+        expiry = offsetExpiry + event;
+    }
 
-	*brightnessPtr = (float)brightness;
-	*expiryPtr = expiry;
+    *brightnessPtr = (float) brightness;
+    *expiryPtr = expiry;
 }
 
 SSCBrightnessResult ssc_calculate_brightness(SSCBrightnessParams *params, SSCAroundTimeResult *result) {
-	SSCBrightnessResult ret;
+    SSCBrightnessResult ret;
 
-	float low = params->brightness_night;
-	float high = params->brightness_day;
+    float low = params->brightness_night;
+    float high = params->brightness_day;
 
-	time_t transitionSeconds = params->transition_mins * 60;	//time for transition from low to high
-	time_t halfTransitionSeconds = transitionSeconds / 2;
-	time_t A, B;
+    time_t transitionSeconds = params->transition_mins * 60;    //time for transition from low to high
+    time_t halfTransitionSeconds = transitionSeconds / 2;
+    time_t A, B;
 
-	if (result->visible) {
-		A = result->rise + halfTransitionSeconds;
-		B = result->set - halfTransitionSeconds;
-	} else {
-		A = result->set + halfTransitionSeconds;
-		B = result->rise - halfTransitionSeconds;
-	}
+    if (result->visible) {
+        A = result->rise + halfTransitionSeconds;
+        B = result->set - halfTransitionSeconds;
+    } else {
+        A = result->set + halfTransitionSeconds;
+        B = result->rise - halfTransitionSeconds;
+    }
 
-	if (result->time < A) {
-		time_t event = result->visible ? result->rise : result->set;
-		sine_curve(result->time, transitionSeconds, event, !result->visible, low, high, params->refresh_diff, &ret.brightness, &ret.expiry);
+    if (result->time < A) {
+        time_t event = result->visible ? result->rise : result->set;
+        sine_curve(result->time, transitionSeconds, event, !result->visible, low, high, params->refresh_diff,
+                   &ret.brightness, &ret.expiry);
 
-	} else if (result->time >= B) {		//greater or equal to or it would get stuck in a loop
-		time_t event = result->visible ? result->set : result->rise;
-		sine_curve(result->time, transitionSeconds, event, result->visible, low, high, params->refresh_diff, &ret.brightness, &ret.expiry);
+    } else if (result->time >= B) {        //greater or equal to or it would get stuck in a loop
+        time_t event = result->visible ? result->set : result->rise;
+        sine_curve(result->time, transitionSeconds, event, result->visible, low, high, params->refresh_diff,
+                   &ret.brightness, &ret.expiry);
 
-	} else {
-		ret.brightness = (result->visible) ? high : low;
-		ret.expiry = B;
-	}
-	
-	return ret;
+    } else {
+        ret.brightness = (result->visible) ? high : low;
+        ret.expiry = B;
+    }
+
+    return ret;
 }
 
 
@@ -221,45 +227,45 @@ int main() {
 #include "gmtime.h"
 
 void simulate_cycle() {
-	SSCBrightnessParams cfg;
-	cfg.brightness_day = 90;
-	cfg.brightness_night = 50;
-	cfg.transition_mins = 30;
-	cfg.refresh_diff = 1.0;
+    SSCBrightnessParams cfg;
+    cfg.brightness_day = 90;
+    cfg.brightness_night = 50;
+    cfg.transition_mins = 30;
+    cfg.refresh_diff = 1.0;
 
-	time_t now;
+    time_t now;
     time(&now);
     struct tm now_tm;
     gmtime_r(&now, &now_tm);
 
-	time_t start = time_t_for_time(now_tm.tm_year + 1900, now_tm.tm_mon + 1, now_tm.tm_mday, 12, 0, 0);
-	time_t end = time_t_for_time(now_tm.tm_year + 1900, now_tm.tm_mon + 1, now_tm.tm_mday + 1, 12, 0, 0);
-	while (start <= end) {
+    time_t start = time_t_for_time(now_tm.tm_year + 1900, now_tm.tm_mon + 1, now_tm.tm_mday, 12, 0, 0);
+    time_t end = time_t_for_time(now_tm.tm_year + 1900, now_tm.tm_mon + 1, now_tm.tm_mday + 1, 12, 0, 0);
+    while (start <= end) {
 
-		SSCAroundTimeResult ssr;		// Calculate the sunrise and sunset
-		ssc_around_time(51.4545, -2.5879, start, &ssr);
-		SSCBrightnessResult result = ssc_calculate_brightness(&cfg, &ssr);  //Calculate the brightness
+        SSCAroundTimeResult ssr;        // Calculate the sunrise and sunset
+        ssc_around_time(51.4545, -2.5879, start, &ssr);
+        SSCBrightnessResult result = ssc_calculate_brightness(&cfg, &ssr);  //Calculate the brightness
 
         char strNow[100];
         struct tm *local = localtime(&start);
         strftime(strNow, sizeof(strNow), "%d/%m/%y %H:%M", local);
 
         char strSet[100];
-		struct tm *set = localtime(&ssr.set);
-		strftime(strSet, sizeof(strSet), "%d/%m/%y %H:%M", set);
+        struct tm *set = localtime(&ssr.set);
+        strftime(strSet, sizeof(strSet), "%d/%m/%y %H:%M", set);
 
         char strRise[100];
         struct tm *rise = localtime(&ssr.rise);
-		strftime(strRise, sizeof(strRise), "%d/%m/%y %H:%M", rise);
+        strftime(strRise, sizeof(strRise), "%d/%m/%y %H:%M", rise);
 
-		printf("At: %s \t Brightness: %f%% \t Set: %s \t Rise: %s \n", strNow, result.brightness, strSet, strRise);
-		start = result.expiry;
+        printf("At: %s \t Brightness: %f%% \t Set: %s \t Rise: %s \n", strNow, result.brightness, strSet, strRise);
+        start = result.expiry;
 
-	}
+    }
 }
 
 int main() {
-	simulate_cycle();
+    simulate_cycle();
 }
 
 #endif

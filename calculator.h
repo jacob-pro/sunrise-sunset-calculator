@@ -10,18 +10,18 @@
 #define CALCULATOR_H
 
 typedef struct {
-	int year;
-	int month;
-	int day;
-	int hours;
-	int mins;
+    int year;
+    int month;
+    int day;
+    int hours;
+    int mins;
 } SSCDateTimeUTC;
 
 typedef enum {
-	SSCStatusSuccess,
-	SSCStatusInvalidCoords,
-	SSCStatusInvalidDate,
-	SSCStatusYearUnsupported,
+    SSCStatusSuccess,
+    SSCStatusInvalidCoords,
+    SSCStatusInvalidDate,
+    SSCStatusYearUnsupported,
 } SSCStatus;
 
 // Notes on accuracy:
@@ -33,6 +33,7 @@ typedef enum {
 // Years must be within the range of -1000 and +3000 C.E.
 // Latitude is N, Longitude is E
 // Confirm that SSCStatusSuccess is returned before using dates.
-SSCStatus ssc_calculate(int year, int month, int day, double latitude, double longitude, SSCDateTimeUTC *rise, SSCDateTimeUTC *set);
+SSCStatus ssc_calculate(int year, int month, int day, double latitude, double longitude, SSCDateTimeUTC *rise,
+                        SSCDateTimeUTC *set);
 
 #endif
