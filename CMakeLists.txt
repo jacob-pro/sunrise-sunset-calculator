@@ -15,6 +15,17 @@ set(SOURCES
         )
 add_library(ssc ${SOURCES})
 
+set(TYPES ${CMAKE_CONFIGURATION_TYPES})
+list(TRANSFORM TYPES PREPEND _)
+list(APPEND TYPES "")
+foreach( OUTPUTCONFIG ${TYPES} )
+ string( TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG )
+ set_target_properties(ssc PROPERTIES RUNTIME_OUTPUT_DIRECTORY${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/bin )
+ set_target_properties(ssc PROPERTIES LIBRARY_OUTPUT_DIRECTORY${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib )
+ set_target_properties(ssc PROPERTIES ARCHIVE_OUTPUT_DIRECTORY${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib )
+endforeach( OUTPUTCONFIG TYPES )
+
+
 # Unit Tests
 add_executable(TestCalculator "calculator.c")
 add_test (NAME TestCalculator COMMAND TestCalculator)
@@ -31,3 +42,5 @@ target_compile_definitions(TestBrightness PRIVATE TEST_BRIGHTNESS=1)
 # Demo Executable
 add_executable(BrightnessSimulation "adapter.c" "calculator.c" "brightness.c")
 target_compile_definitions(BrightnessSimulation PRIVATE BRIGHTNESS_SIM=1)
+
+
