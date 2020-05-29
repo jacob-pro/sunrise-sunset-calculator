@@ -13,7 +13,7 @@ set(SOURCES
         adapter.c
         brightness.c
         )
-add_library(sunrise-sunset-calculator ${SOURCES})
+add_library(ssc ${SOURCES})
 
 # Unit Tests
 add_executable(TestCalculator "calculator.c")
