@@ -53,7 +53,7 @@ static void sine_curve(time_t x,
     *brightnessPtr = brightness;
 }
 
-SSCBrightnessResult ssc_calculate_brightness(SSCBrightnessParams *params, SSCAroundTimeResult *result) {
+SSCBrightnessResult ssc_calculate_brightness(const SSCBrightnessParams *params, const SSCAroundTimeResult *result) {
     SSCBrightnessResult ret;
     int low = params->brightness_night;
     int high = params->brightness_day;

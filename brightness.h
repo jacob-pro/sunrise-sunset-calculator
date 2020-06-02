@@ -22,6 +22,6 @@ typedef struct {
 
 // Calculates the brightness for a given configuration using given sunrise info.
 // Use `ssc_around_time` to create a result at the desired time.
-SSCBrightnessResult ssc_calculate_brightness(SSCBrightnessParams *params, SSCAroundTimeResult *result);
+SSCBrightnessResult ssc_calculate_brightness(const SSCBrightnessParams *params, const SSCAroundTimeResult *result);
 
 #endif
