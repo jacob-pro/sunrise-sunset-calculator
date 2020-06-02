@@ -9,7 +9,7 @@
 
 #include <time.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #define timegm _mkgmtime
 #define gmtime_r(time, result) gmtime_s(result, time)
 #endif
