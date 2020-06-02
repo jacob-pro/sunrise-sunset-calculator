@@ -10,14 +10,14 @@
 #include <time.h>
 
 typedef struct {
-    int brightness_night;    // Night brightness 0-100
-    int brightness_day;      // Day brightness 0-100
-    int transition_mins;     // Number of minutes to transition between the two
+	unsigned int brightness_night;    // Night brightness 0-100
+    unsigned int brightness_day;      // Day brightness 0-100
+	unsigned int transition_mins;     // Number of minutes to transition between the two
 } SSCBrightnessParams;
 
 typedef struct {
-    int brightness;         // The brightness as a percentage
-    int expiry_seconds;     // How many seconds to wait before recalculating
+	unsigned int brightness;         // The brightness as a percentage
+	unsigned int expiry_seconds;     // How many seconds to wait before recalculating
 } SSCBrightnessResult;
 
 // Calculates the brightness for a given configuration using given sunrise info.

@@ -24,10 +24,10 @@ static void sine_curve(time_t x,
                        time_t transition,
                        time_t event,
                        bool decreasing,
-                       int low,
-                       int high,
-                       int *brightnessPtr,
-                       int *expiryPtr
+                       unsigned int low,
+                       unsigned int high,
+                       unsigned int *brightnessPtr,
+                       unsigned int *expiryPtr
 ) {
     // We need to transform the sine function
     double Ymultiplier = (high - low) / 2.0;     // scale height to the difference between min and max brightness
@@ -55,10 +55,10 @@ static void sine_curve(time_t x,
 
 SSCBrightnessResult ssc_calculate_brightness(const SSCBrightnessParams *params, const SSCAroundTimeResult *result) {
     SSCBrightnessResult ret;
-    int low = params->brightness_night;
-    int high = params->brightness_day;
-    int transitionSeconds = params->transition_mins * 60;    //time for transition from low to high
-    int halfTransitionSeconds = transitionSeconds / 2;
+    unsigned int low = params->brightness_night;
+    unsigned int high = params->brightness_day;
+    unsigned int transitionSeconds = params->transition_mins * 60;    //time for transition from low to high
+    unsigned int halfTransitionSeconds = transitionSeconds / 2;
 
     time_t A, B;
     if (result->visible) {      // Daytime
