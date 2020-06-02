@@ -18,26 +18,30 @@
  * @param decreasing - set true if the function should be decreasing
  * @param low
  * @param high
- * @param refresh_diff
  * @param brightnessPtr - brightness result
  * @param expiryPtr - expiry result
  */
-static void
-sine_curve(time_t x, time_t transition, time_t event, bool decreasing, float low, float high, float refresh_diff,
-           float *brightnessPtr, time_t *expiryPtr) {
-
+static void sine_curve(time_t x,
+                       time_t transition,
+                       time_t event,
+                       bool decreasing,
+                       int low,
+                       int high,
+                       int *brightnessPtr,
+                       time_t *expiryPtr
+) {
     // We need to transform the sine function
-    double Ymultiplier = (high - low) / 2.0;    //scale height to the difference between min and max brightness
-    double Yoffset = Ymultiplier + low;        //shift upwards to the midpoint brightness
-    double Xmultiplier = M_PI / transition;        //scale half a cycle to be equal to the transition time
-    if (decreasing) Xmultiplier = -Xmultiplier;    //flip the curve for to make it a decreasing function
-    time_t Xoffset = x - event;            //shift rightwards to centre on the sunrise/sunset event
-    double brightness = (Ymultiplier * sin(Xmultiplier * Xoffset)) + Yoffset;
+    double Ymultiplier = (high - low) / 2.0;     // scale height to the difference between min and max brightness
+    double Yoffset = Ymultiplier + low;          // shift upwards to the midpoint brightness
+    double Xmultiplier = M_PI / transition;      // scale half a cycle to be equal to the transition time
+    if (decreasing) Xmultiplier = -Xmultiplier;  // flip the curve for to make it a decreasing function
+    time_t Xoffset = x - event;                  // shift rightwards to centre on the sunrise/sunset event
+    double brightnessf = (Ymultiplier * sin(Xmultiplier * Xoffset)) + Yoffset;
+    int brightness = (int) round(brightnessf);   // round to nearest integer brightness
 
-    //Work out the expiry time
+    // Work out the expiry time; when the brightness will change to the next integer value
     time_t expiry;
-    if (decreasing) refresh_diff = -refresh_diff;
-    double nextUpdateBrightness = brightness + refresh_diff;
+    int nextUpdateBrightness = decreasing ? brightness - 1 : brightness + 1;
     if (nextUpdateBrightness > high) nextUpdateBrightness = high;
     else if (nextUpdateBrightness < low) nextUpdateBrightness = low;
     if (x == event) {
@@ -48,15 +52,15 @@ sine_curve(time_t x, time_t transition, time_t event, bool decreasing, float low
         expiry = offsetExpiry + event;
     }
 
-    *brightnessPtr = (float) brightness;
+    *brightnessPtr = brightness;
     *expiryPtr = expiry;
 }
 
 SSCBrightnessResult ssc_calculate_brightness(SSCBrightnessParams *params, SSCAroundTimeResult *result) {
     SSCBrightnessResult ret;
 
-    float low = params->brightness_night;
-    float high = params->brightness_day;
+    int low = params->brightness_night;
+    int high = params->brightness_day;
 
     time_t transitionSeconds = params->transition_mins * 60;    //time for transition from low to high
     time_t halfTransitionSeconds = transitionSeconds / 2;
@@ -72,13 +76,11 @@ SSCBrightnessResult ssc_calculate_brightness(SSCBrightnessParams *params, SSCAro
 
     if (result->time < A) {
         time_t event = result->visible ? result->rise : result->set;
-        sine_curve(result->time, transitionSeconds, event, !result->visible, low, high, params->refresh_diff,
-                   &ret.brightness, &ret.expiry);
+        sine_curve(result->time, transitionSeconds, event, !result->visible, low, high, &ret.brightness, &ret.expiry);
 
     } else if (result->time >= B) {        //greater or equal to or it would get stuck in a loop
         time_t event = result->visible ? result->set : result->rise;
-        sine_curve(result->time, transitionSeconds, event, result->visible, low, high, params->refresh_diff,
-                   &ret.brightness, &ret.expiry);
+        sine_curve(result->time, transitionSeconds, event, result->visible, low, high, &ret.brightness, &ret.expiry);
 
     } else {
         ret.brightness = (result->visible) ? high : low;
@@ -96,63 +98,61 @@ SSCBrightnessResult ssc_calculate_brightness(SSCBrightnessParams *params, SSCAro
 
 void test_sunset_sine_curve() {
 
-    float brightness;
+    int brightness;
     time_t expiry;
-    float low = 40;
-    float high = 80;
-    float refresh = 1.0f;
+    int low = 40;
+    int high = 80;
     time_t transitionTime = 60 * 60;	//60 minutes
     time_t fictional_sunset = time_t_for_time(2018, 12, 2, 16, 0, 0);
-    float midpoint = low + (high - low) / 2.0;
+    int midpoint = (int) round(low + (high - low) / 2.0);
 
     //At start of the transition it should equal the day brightness
     time_t start_of_transition = time_t_for_time(2018, 12, 2, 15, 30, 0);
-    sine_curve(start_of_transition, transitionTime, fictional_sunset, true, low, high, refresh, &brightness, &expiry);
+    sine_curve(start_of_transition, transitionTime, fictional_sunset, true, low, high, &brightness, &expiry);
     ASSERT_EQUALS((float)high, brightness);		//80
 
     //Test part way between transition. It should be less than the daytime brightness. But greater than the midpoint because it is not yet sunset
     time_t before_sunset = time_t_for_time(2018, 12, 2, 15, 45, 0);
-    sine_curve(before_sunset, transitionTime, fictional_sunset, true, low, high, refresh, &brightness, &expiry);
+    sine_curve(before_sunset, transitionTime, fictional_sunset, true, low, high, &brightness, &expiry);
     ASSERT("Must be in range", (brightness < high && brightness > midpoint));		//~74
 
     //At sunset it should be half way between the day and night brightness
-    sine_curve(fictional_sunset, transitionTime, fictional_sunset, true, low, high, refresh, &brightness, &expiry);
+    sine_curve(fictional_sunset, transitionTime, fictional_sunset, true, low, high, &brightness, &expiry);
     ASSERT_EQUALS(midpoint, brightness);		//60
 
     //At end of the transition it should equal the night brightness
     time_t end_of_transition = time_t_for_time(2018, 12, 2, 16, 30, 0);
-    sine_curve(end_of_transition, transitionTime, fictional_sunset, true, low, high, refresh, &brightness, &expiry);
+    sine_curve(end_of_transition, transitionTime, fictional_sunset, true, low, high, &brightness, &expiry);
     ASSERT_EQUALS((float)low, brightness);		//40
 }
 
 void test_sunrise_sine_curve() {
 
-    float brightness;
+    int brightness;
     time_t expiry;
-    float low = 35;
-    float high = 76;
-    float refresh = 1.0f;
+    int low = 35;
+    int high = 76;
     time_t transitionTime = 40 * 60;	//40 minutes
     time_t fictional_sunrise = time_t_for_time(2018, 12, 2, 8, 0, 0);
-    float midpoint = low + (high - low) / 2.0;
+    int midpoint = (int) round(low + (high - low) / 2.0);
 
     //At start of the transition it should equal the night brightness
     time_t start_of_transition = time_t_for_time(2018, 12, 2, 7, 40, 0);
-    sine_curve(start_of_transition, transitionTime, fictional_sunrise, false, low, high, refresh, &brightness, &expiry);
+    sine_curve(start_of_transition, transitionTime, fictional_sunrise, false, low, high, &brightness, &expiry);
     ASSERT_EQUALS((float)low, brightness);			//35
 
     //Test part way between transition. It should be greater than night brighness. But less than the midpoint because it is not yet sunrise
     time_t before_sunrise = time_t_for_time(2018, 12, 2, 7, 50, 0);
-    sine_curve(before_sunrise, transitionTime, fictional_sunrise, false, low, high, refresh, &brightness, &expiry);
+    sine_curve(before_sunrise, transitionTime, fictional_sunrise, false, low, high, &brightness, &expiry);
     ASSERT("Must be in range", (brightness > low && brightness < midpoint));		//~41
 
     //At sunrise it should be half way between the day and night brightness
-    sine_curve(fictional_sunrise, transitionTime, fictional_sunrise, false, low, high, refresh, &brightness, &expiry);
+    sine_curve(fictional_sunrise, transitionTime, fictional_sunrise, false, low, high, &brightness, &expiry);
     ASSERT_EQUALS(midpoint, brightness);		//55.5
 
     //At end of the transition it should equal the daytime brightness
     time_t end_of_transition = time_t_for_time(2018, 12, 2, 8, 20, 0);
-    sine_curve(end_of_transition, transitionTime, fictional_sunrise, false, low, high, refresh, &brightness, &expiry);
+    sine_curve(end_of_transition, transitionTime, fictional_sunrise, false, low, high, &brightness, &expiry);
     ASSERT_EQUALS((float)high, brightness);		//76
 }
 
@@ -172,7 +172,6 @@ void test_whole_algorithm() {
     cfg.brightness_day = 90;
     cfg.brightness_night = 50;
     cfg.transition_mins = 120;
-    cfg.refresh_diff = 1.0f;
 
     SSCAroundTimeResult input;
     input.rise = time_t_for_time(2018, 11, 1, 8, 0, 0);
@@ -231,7 +230,6 @@ void simulate_cycle() {
     cfg.brightness_day = 90;
     cfg.brightness_night = 50;
     cfg.transition_mins = 30;
-    cfg.refresh_diff = 1.0;
 
     time_t now;
     time(&now);
@@ -258,7 +256,7 @@ void simulate_cycle() {
         struct tm *rise = localtime(&ssr.rise);
         strftime(strRise, sizeof(strRise), "%d/%m/%y %H:%M", rise);
 
-        printf("At: %s \t Brightness: %f%% \t Set: %s \t Rise: %s \n", strNow, result.brightness, strSet, strRise);
+        printf("At: %s \t Brightness: %d%% \t Set: %s \t Rise: %s \n", strNow, result.brightness, strSet, strRise);
         start = result.expiry;
 
     }

@@ -10,14 +10,13 @@
 #include <time.h>
 
 typedef struct {
-    float brightness_night;     // Night brightness 0-100
-    float brightness_day;    // Day brightness 0-100
+    int brightness_night;     // Night brightness 0-100
+    int brightness_day;    // Day brightness 0-100
     int transition_mins;     // Number of mins to transition between the two
-    float refresh_diff;      // Smaller refresh difference = shorter expiry
 } SSCBrightnessParams;
 
 typedef struct {
-    float brightness;         // The brightness as a percentage
+    int brightness;         // The brightness as a percentage
     time_t expiry;             // When this result expires it should be recalculated
 } SSCBrightnessResult;
 
