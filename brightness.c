@@ -66,7 +66,7 @@ SSCBrightnessResult ssc_calculate_brightness(const SSCBrightnessParams *params, 
         B = result->set - halfTransitionSeconds;   // Whe the sun sets this evening - transition
     } else {                    // Nighttime
         A = result->set + halfTransitionSeconds;   // When the sun set at the start of night + transition
-		B = result->rise - halfTransitionSeconds;  // When the sun will rise again - transition
+        B = result->rise - halfTransitionSeconds;  // When the sun will rise again - transition
     }
 
     if (result->time < A) {
