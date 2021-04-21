@@ -4,7 +4,7 @@ enable_testing()
 
 # CLang / GCC Config
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
- set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic")
+ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic -lm")
 endif()
 
 # The library
