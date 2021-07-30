@@ -1,0 +1,41 @@
+/*
+*  ssc.h
+*  Sunrise Sunset Calculator
+*  Created by Jacob Halsey on 31/07/2021.
+*/
+
+#ifndef SUNRISE_SUNSET_CALCULATOR_SSC_H
+#define SUNRISE_SUNSET_CALCULATOR_SSC_H
+
+#include <stdint.h>
+#include <stdbool.h>
+
+typedef uint64_t unix_t;
+
+typedef struct
+{
+    // Always required inputs
+    unix_t time;         // Unix time
+    double latitude;     // Observer latitude (negative south of equator)
+    double longitude;    // Observer longitude (negative west of Greenwich)
+
+    // Defaults are available
+    double delta_ut1;    // Fractional second difference between UTC and UT which is used
+    double delta_t;      // Difference between earth rotation time and terrestrial time
+    double elevation;    // Observer elevation [meters]
+    double pressure;     // Annual average local pressure [millibars]
+    double temperature;  // Annual average local temperature [degrees Celsius]
+    double atmos_refract;// Atmospheric refraction at sunrise and sunset (0.5667 deg is typical)
+} ssc_input;
+
+void ssc_input_defaults(ssc_input *input, uint64_t time, double latitude, double longitude);
+
+typedef struct {
+    unix_t sunset;
+    unix_t sunrise;
+    bool visible;
+} ssc_result;
+
+int ssc(ssc_input *input, ssc_result *result);
+
+#endif //SUNRISE_SUNSET_CALCULATOR_SSC_H
