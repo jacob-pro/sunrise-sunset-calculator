@@ -24,6 +24,19 @@
 #ifndef __solar_position_algorithm_header
 #define __solar_position_algorithm_header
 
+typedef enum {
+    SpaStatus_Success = 0,
+    SpaStatus_UnsupportedDate = 1,
+    SpaStatus_InvalidPressure = 12,
+    SpaStatus_InvalidTemperature = 13,
+    SpaStatus_InvalidDeltaUt1 = 17,
+    SpaStatus_InvalidDeltaT = 7,
+    SpaStatus_InvalidLongitude = 9,
+    SpaStatus_InvalidLatitude = 10,
+    SpaStatus_InvalidAtmosRefract = 16,
+    SpaStatus_InvalidElevation = 16,
+} SpaStatus;
+
 typedef struct {
     //----------------------INPUT VALUES------------------------
 
@@ -109,6 +122,6 @@ typedef struct {
 
 } spa_data;
 
-int spa_calculate(spa_data *spa);
+SpaStatus spa_calculate(spa_data *spa);
 
 #endif

@@ -45,7 +45,7 @@ int main() {
     spa.atmos_refract = 0.5667;
 
     int result = spa_calculate(&spa);
-    assert(result == 0);
+    assert(result == SpaStatus_Success);
 
     printf("Julian Day:    %.6f\n", spa.jd);
     printf("L:             %.6e degrees\n", spa.l);

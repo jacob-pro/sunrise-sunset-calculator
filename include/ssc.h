@@ -6,6 +6,7 @@
 #ifndef SUNRISE_SUNSET_CALCULATOR_SSC_H
 #define SUNRISE_SUNSET_CALCULATOR_SSC_H
 
+#include "spa.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -35,6 +36,6 @@ typedef struct {
     bool visible;
 } ssc_result;
 
-int ssc(ssc_input *input, ssc_result *result);
+SpaStatus ssc(ssc_input *input, ssc_result *result);
 
 #endif //SUNRISE_SUNSET_CALCULATOR_SSC_H

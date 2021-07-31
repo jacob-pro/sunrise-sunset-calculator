@@ -52,7 +52,7 @@ static void test_platform() {
 static void test_bristol() {
     ssc_input input;
     ssc_result result;
-    int status;
+    SpaStatus status;
 
     //Early morning of Monday 18th, Sun is not visible. It set at 16:17 the day before, and is due to rise at 7:35
     time_t set18 = time_t_for_time(2018, 11, 18, 16, 17);  // 16:17 Sunset
@@ -60,7 +60,7 @@ static void test_bristol() {
     time_t rise19 = time_t_for_time(2018, 11, 19, 7, 35);  // 7:35 Sunrise
     ssc_input_defaults(&input, early19, BRISTOL_LAT, BRISTOL_LON);
     status = ssc(&input, &result);
-    ASSERT_EQUALS(0, status);
+    ASSERT_EQUALS(SpaStatus_Success, status);
     ASSERT_VALID_RESULT(result, rise19, set18, false);
 
     //In the middle of Monday 18th, Sun is visible. It should have risen at 7:35 and be due to set at 16:16
@@ -68,7 +68,7 @@ static void test_bristol() {
     time_t set19 = time_t_for_time(2018, 11, 19, 16, 16);   // 16:16 Sunset
     ssc_input_defaults(&input, midday19, BRISTOL_LAT, BRISTOL_LON);
     status = ssc(&input, &result);
-    ASSERT_EQUALS(0, status);
+    ASSERT_EQUALS(SpaStatus_Success, status);
     ASSERT_VALID_RESULT(result, rise19, set19, true);
 
     //In the evening of Monday 18th, Sun is not visible. It should have set at 16:16 and be due to rise tomorrow at 7:36
@@ -76,7 +76,7 @@ static void test_bristol() {
     time_t rise20 = time_t_for_time(2018, 11, 20, 7, 36);  // 7:36 Sunrise
     ssc_input_defaults(&input, late19, BRISTOL_LAT, BRISTOL_LON);
     status = ssc(&input, &result);
-    ASSERT_EQUALS(0, status);
+    ASSERT_EQUALS(SpaStatus_Success, status);
     ASSERT_VALID_RESULT(result, rise20, set19, false);
 }
 
@@ -84,11 +84,11 @@ static void test_outer_bounds_impl(time_t start, double lat, double lon, unsigne
     time_t end = start + (days * 24 * 60 * 60);
     ssc_input input;
     ssc_result result;
-    int status;
+    SpaStatus status;
     while (start <= end) {
         ssc_input_defaults(&input, start, lat, lon);
         status = ssc(&input, &result);
-        ASSERT_EQUALS(0, status);
+        ASSERT_EQUALS(SpaStatus_Success, status);
         ASSERT("Bounded",
                ((result.rise <= start) && (start <= result.set)) || ((result.set <= start) && (start <= result.rise)));
         ASSERT_EQUALS((start > result.rise), result.visible);

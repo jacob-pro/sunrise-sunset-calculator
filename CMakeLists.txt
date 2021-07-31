@@ -7,12 +7,6 @@ include_directories(tinytest)
 include_directories(include)
 include_directories(src)
 
-file(GLOB ALL_C_SOURCE_FILES
-        include/*.[chi]
-        src/*.[chi]
-        test/*.[chi]
-        )
-
 # Math library
 check_library_exists(m sin "" HAVE_LIB_M)                                                                                                                                                                                                                                         
 if (HAVE_LIB_M)                                                                                                                          
@@ -44,6 +38,7 @@ foreach( OUTPUTCONFIG ${TYPES} )
  set_target_properties(ssc PROPERTIES ARCHIVE_OUTPUT_DIRECTORY${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib )
 endforeach( OUTPUTCONFIG TYPES )
 
+# Tests
 add_executable(test_spa "src/spa.c" "test/spa_tester.c")
 target_link_libraries(test_spa PUBLIC ${EXTRA_LIBS})
 add_test (NAME test_spa COMMAND test_spa)
@@ -52,4 +47,10 @@ add_executable(test_ssc "src/spa.c" "src/ssc.c" "test/test_ssc.c")
 target_link_libraries(test_ssc PUBLIC ${EXTRA_LIBS})
 add_test(NAME test_ssc COMMAND test_ssc)
 
+# Code format helper tools
+file(GLOB ALL_C_SOURCE_FILES
+        include/*.[chi]
+        src/*.[chi]
+        test/*.[chi]
+        )
 add_custom_target(clang-format COMMAND clang-format-12 --style=file -i ${ALL_C_SOURCE_FILES})

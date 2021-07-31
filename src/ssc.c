@@ -4,7 +4,6 @@
 //  Created by Jacob Halsey on 31/07/2021.
 //
 #include "ssc.h"
-#include "spa.h"
 
 void ssc_input_defaults(ssc_input *input, unix_t time, double latitude, double longitude) {
     input->time = time;
@@ -30,7 +29,7 @@ static inline bool sun_is_up(spa_data *result) {
 }
 
 #define ENSURE_SPA_RESULT                                                                                              \
-    if (spa_result != 0) {                                                                                             \
+    if (spa_result != SpaStatus_Success) {                                                                             \
         return spa_result;                                                                                             \
     }
 
@@ -51,7 +50,7 @@ static int search_for_event(spa_data *data, unix_t start, int64_t step_size, boo
     return 0;
 }
 
-int ssc(ssc_input *input, ssc_result *result) {
+SpaStatus ssc(ssc_input *input, ssc_result *result) {
     spa_data data;
     int spa_result;
 
@@ -77,5 +76,5 @@ int ssc(ssc_input *input, ssc_result *result) {
     spa_result = search_for_event(&data, input->time, step_signed, !result->visible, forward_time);
     ENSURE_SPA_RESULT;
 
-    return 0;
+    return SpaStatus_Success;
 }
