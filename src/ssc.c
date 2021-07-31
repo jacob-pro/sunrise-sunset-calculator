@@ -35,7 +35,9 @@ static inline double jd_from_unix(unix_t t) {
     return (t / 86400.0) + 2440587.5;
 }
 
-// https://github.com/skyfielders/python-skyfield/blob/aa59e2d4711c3a95804170889f138402edbf4237/skyfield/almanac.py#L242
+// See Skyfield's general purpose implementation this is inspired by:
+// https://github.com/skyfielders/python-skyfield/blob/aa59e2d4711c3a95804170889f138402edbf4237/skyfield/almanac.py#L216
+// https://github.com/skyfielders/python-skyfield/blob/aa59e2d4711c3a95804170889f138402edbf4237/skyfield/searchlib.py#L12
 static inline bool sun_is_up(spa_data *result) {
     return result->e >= -0.8333;
 }
