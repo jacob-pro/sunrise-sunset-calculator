@@ -11,4 +11,5 @@ PenaltyReturnTypeOnItsOwnLine: 100
 ReflowComments: false
 AllowShortIfStatementsOnASingleLine: WithoutElse
 # AlignArrayOfStructures: Left
+SpaceAfterCStyleCast: true
 ---

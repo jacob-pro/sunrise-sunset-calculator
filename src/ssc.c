@@ -4,6 +4,18 @@
 //  Created by Jacob Halsey on 31/07/2021.
 //
 #include "ssc.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+// This is approximate - goal here is too have large as possible step size without missing a rise/set
+static uint32_t default_step_size(double latitude) {
+    double shortest_day_hours_approx = (24.0 / M_PI) * acos(latitude / 66.0);
+    int64_t seconds = (int64_t) (shortest_day_hours_approx * 3600) - 1800;
+    if (seconds < 600 || fabs(latitude) > 66.0) {
+        seconds = 600;
+    }
+    return (uint32_t) seconds;
+}
 
 void ssc_input_defaults(ssc_input *input, unix_t time, double latitude, double longitude) {
     input->time = time;
@@ -15,7 +27,7 @@ void ssc_input_defaults(ssc_input *input, unix_t time, double latitude, double l
     input->pressure = 1013.25;
     input->temperature = 16.0;
     input->atmos_refract = 0.5667;
-    input->step_size = 3600;
+    input->step_size = default_step_size(latitude);
 }
 
 // https://stackoverflow.com/a/466348
@@ -69,7 +81,7 @@ SpaStatus ssc(ssc_input *input, ssc_result *result) {
 
     unix_t *backward_time = result->visible ? &result->rise : &result->set;
     unix_t *forward_time = result->visible ? &result->set : &result->rise;
-    int64_t step_signed = (int64_t)input->step_size;
+    int64_t step_signed = (int64_t) input->step_size;
 
     spa_result = search_for_event(&data, input->time, -step_signed, !result->visible, backward_time);
     ENSURE_SPA_RESULT;

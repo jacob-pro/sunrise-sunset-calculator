@@ -26,6 +26,10 @@ typedef struct {
     double temperature;   // Annual average local temperature [degrees Celsius]
     double atmos_refract; // Atmospheric refraction at sunrise and sunset (0.5667 deg is typical)
     uint32_t step_size;   // Search step size
+                          // It needs to be less than the length of the shortest day/night
+                          // If it is too large there is a risk of missing event
+                          // However too small will be slow, since more iterations will be done than necessary
+                          // A default is set proportional to your latitude
 } ssc_input;
 
 void ssc_input_defaults(ssc_input *input, unix_t time, double latitude, double longitude);
