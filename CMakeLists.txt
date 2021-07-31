@@ -7,6 +7,12 @@ include_directories(tinytest)
 include_directories(include)
 include_directories(src)
 
+file(GLOB ALL_C_SOURCE_FILES
+        include/*.[chi]
+        src/*.[chi]
+        test/*.[chi]
+        )
+
 # Math library
 check_library_exists(m sin "" HAVE_LIB_M)                                                                                                                                                                                                                                         
 if (HAVE_LIB_M)                                                                                                                          
@@ -44,4 +50,6 @@ add_test (NAME test_spa COMMAND test_spa)
 
 add_executable(test_ssc "src/spa.c" "src/ssc.c" "test/test_ssc.c")
 target_link_libraries(test_ssc PUBLIC ${EXTRA_LIBS})
-add_test (NAME test_ssc COMMAND test_ssc)
+add_test(NAME test_ssc COMMAND test_ssc)
+
+add_test(NAME test_format COMMAND clang-format --dry-run --Werror ${ALL_C_SOURCE_FILES})

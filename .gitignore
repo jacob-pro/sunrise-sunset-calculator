@@ -6,4 +6,5 @@ CMakeCache.txt
 CTestTestfile.cmake
 *.a
 Makefile
-test_spa
+Testing/
+*.exe

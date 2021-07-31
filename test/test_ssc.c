@@ -89,7 +89,8 @@ static void test_outer_bounds_impl(time_t start, double lat, double lon, unsigne
         ssc_input_defaults(&input, start, lat, lon);
         status = ssc(&input, &result);
         ASSERT_EQUALS(0, status);
-        ASSERT("Bounded", (result.rise <= start <= result.set) || (result.set <= start <= result.rise));
+        ASSERT("Bounded", ((result.rise <= start) && (start <= result.set))
+            || ((result.set <= start) && (start <= result.rise)));
         ASSERT_EQUALS((start > result.rise), result.visible);
         start += incr;
     }
