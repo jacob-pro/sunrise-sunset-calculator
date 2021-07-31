@@ -3,10 +3,10 @@
 //  Sunrise Sunset Calculator
 //  Created by Jacob Halsey on 31/07/2021.
 //
+#include "ssc.h"
+#include <assert.h>
 #include <time.h>
 #include <tinytest.h>
-#include <assert.h>
-#include "ssc.h"
 
 #ifdef _WIN32
 #define timegm _mkgmtime
@@ -18,9 +18,9 @@ static inline bool test_times(unix_t expected, unix_t actual) {
     return llabs(expected - actual) < ACCURACY_SECONDS;
 }
 
-#define ASSERT_VALID_RESULT(result, r, s, v)                  \
-    ASSERT("Sunrise correct", test_times(r, result.rise)); \
-    ASSERT("Sunset correct", test_times(s, result.set));   \
+#define ASSERT_VALID_RESULT(result, r, s, v)                                                                           \
+    ASSERT("Sunrise correct", test_times(r, result.rise));                                                             \
+    ASSERT("Sunset correct", test_times(s, result.set));                                                               \
     ASSERT_EQUALS(v, result.visible)
 
 #define BRISTOL_LAT 51.4545
@@ -55,25 +55,25 @@ static void test_bristol() {
     int status;
 
     //Early morning of Monday 18th, Sun is not visible. It set at 16:17 the day before, and is due to rise at 7:35
-    time_t set18 = time_t_for_time(2018, 11, 18, 16, 17);	// 16:17 Sunset
-    time_t early19 = time_t_for_time(2018, 11, 19, 5, 30);	// 5:30 Early morning
-    time_t rise19 = time_t_for_time(2018, 11, 19, 7, 35);		// 7:35 Sunrise
+    time_t set18 = time_t_for_time(2018, 11, 18, 16, 17);  // 16:17 Sunset
+    time_t early19 = time_t_for_time(2018, 11, 19, 5, 30); // 5:30 Early morning
+    time_t rise19 = time_t_for_time(2018, 11, 19, 7, 35);  // 7:35 Sunrise
     ssc_input_defaults(&input, early19, BRISTOL_LAT, BRISTOL_LON);
     status = ssc(&input, &result);
     ASSERT_EQUALS(0, status);
     ASSERT_VALID_RESULT(result, rise19, set18, false);
 
     //In the middle of Monday 18th, Sun is visible. It should have risen at 7:35 and be due to set at 16:16
-    time_t midday19 = time_t_for_time(2018, 11, 19, 12, 0);		// 12:00 Midday
-    time_t set19 = time_t_for_time(2018, 11, 19, 16, 16);		// 16:16 Sunset
+    time_t midday19 = time_t_for_time(2018, 11, 19, 12, 0); // 12:00 Midday
+    time_t set19 = time_t_for_time(2018, 11, 19, 16, 16);   // 16:16 Sunset
     ssc_input_defaults(&input, midday19, BRISTOL_LAT, BRISTOL_LON);
     status = ssc(&input, &result);
     ASSERT_EQUALS(0, status);
     ASSERT_VALID_RESULT(result, rise19, set19, true);
 
     //In the evening of Monday 18th, Sun is not visible. It should have set at 16:16 and be due to rise tomorrow at 7:36
-    time_t late19 = time_t_for_time(2018, 11, 19, 20, 25);	// 20:25 Evening
-    time_t rise20 = time_t_for_time(2018, 11, 20, 7, 36);		// 7:36 Sunrise
+    time_t late19 = time_t_for_time(2018, 11, 19, 20, 25); // 20:25 Evening
+    time_t rise20 = time_t_for_time(2018, 11, 20, 7, 36);  // 7:36 Sunrise
     ssc_input_defaults(&input, late19, BRISTOL_LAT, BRISTOL_LON);
     status = ssc(&input, &result);
     ASSERT_EQUALS(0, status);
@@ -89,8 +89,8 @@ static void test_outer_bounds_impl(time_t start, double lat, double lon, unsigne
         ssc_input_defaults(&input, start, lat, lon);
         status = ssc(&input, &result);
         ASSERT_EQUALS(0, status);
-        ASSERT("Bounded", ((result.rise <= start) && (start <= result.set))
-            || ((result.set <= start) && (start <= result.rise)));
+        ASSERT("Bounded",
+               ((result.rise <= start) && (start <= result.set)) || ((result.set <= start) && (start <= result.rise)));
         ASSERT_EQUALS((start > result.rise), result.visible);
         start += incr;
     }

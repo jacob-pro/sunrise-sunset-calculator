@@ -21,7 +21,7 @@ void ssc_input_defaults(ssc_input *input, unix_t time, double latitude, double l
 
 // https://stackoverflow.com/a/466348
 static inline double jd_from_unix(unix_t t) {
-    return ( t / 86400.0 ) + 2440587.5;
+    return (t / 86400.0) + 2440587.5;
 }
 
 // https://github.com/skyfielders/python-skyfield/blob/aa59e2d4711c3a95804170889f138402edbf4237/skyfield/almanac.py#L242
@@ -29,9 +29,9 @@ static inline bool sun_is_up(spa_data *result) {
     return result->e >= -0.8333;
 }
 
-#define ENSURE_SPA_RESULT   \
-    if (spa_result != 0) {  \
-        return spa_result;  \
+#define ENSURE_SPA_RESULT                                                                                              \
+    if (spa_result != 0) {                                                                                             \
+        return spa_result;                                                                                             \
     }
 
 static int search_for_event(spa_data *data, unix_t start, int64_t step_size, bool target_upness, unix_t *result) {
@@ -70,7 +70,7 @@ int ssc(ssc_input *input, ssc_result *result) {
 
     unix_t *backward_time = result->visible ? &result->rise : &result->set;
     unix_t *forward_time = result->visible ? &result->set : &result->rise;
-    int64_t step_signed = (int64_t) input->step_size;
+    int64_t step_signed = (int64_t)input->step_size;
 
     spa_result = search_for_event(&data, input->time, -step_signed, !result->visible, backward_time);
     ENSURE_SPA_RESULT;

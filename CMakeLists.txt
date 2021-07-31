@@ -52,4 +52,4 @@ add_executable(test_ssc "src/spa.c" "src/ssc.c" "test/test_ssc.c")
 target_link_libraries(test_ssc PUBLIC ${EXTRA_LIBS})
 add_test(NAME test_ssc COMMAND test_ssc)
 
-add_test(NAME test_format COMMAND clang-format --dry-run --Werror ${ALL_C_SOURCE_FILES})
+add_custom_target(clang-format COMMAND clang-format-12 --style=file -i ${ALL_C_SOURCE_FILES})
