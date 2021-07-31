@@ -3,7 +3,6 @@
 //  Sunrise Sunset Calculator
 //  Created by Jacob Halsey on 31/07/2021.
 //
-
 #include "ssc.h"
 #include "spa.h"
 
@@ -20,6 +19,7 @@ void ssc_input_defaults(ssc_input *input, unix_t time, double latitude, double l
     input->step_size = 3600;
 }
 
+// https://stackoverflow.com/a/466348
 static inline double jd_from_unix(unix_t t) {
     return ( t / 86400.0 ) + 2440587.5;
 }
@@ -68,8 +68,8 @@ int ssc(ssc_input *input, ssc_result *result) {
     if (spa_result) return spa_result;
     result->visible = sun_is_up(&data);
 
-    unix_t *backward_time = result->visible ? &result->sunrise : &result->sunset;
-    unix_t *forward_time = result->visible ? &result->sunset : &result->sunrise;
+    unix_t *backward_time = result->visible ? &result->rise : &result->set;
+    unix_t *forward_time = result->visible ? &result->set : &result->rise;
     int64_t step_signed = (int64_t) input->step_size;
 
     spa_result = search_for_event(&data, input->time, -step_signed, !result->visible, backward_time);

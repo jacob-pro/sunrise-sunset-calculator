@@ -3,14 +3,13 @@
 *  Sunrise Sunset Calculator
 *  Created by Jacob Halsey on 31/07/2021.
 */
-
 #ifndef SUNRISE_SUNSET_CALCULATOR_SSC_H
 #define SUNRISE_SUNSET_CALCULATOR_SSC_H
 
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef uint64_t unix_t;
+typedef int64_t unix_t;
 
 typedef struct
 {
@@ -29,11 +28,11 @@ typedef struct
     uint32_t step_size;    // Search step size
 } ssc_input;
 
-void ssc_input_defaults(ssc_input *input, uint64_t time, double latitude, double longitude);
+void ssc_input_defaults(ssc_input *input, unix_t time, double latitude, double longitude);
 
 typedef struct {
-    unix_t sunset;
-    unix_t sunrise;
+    unix_t set;
+    unix_t rise;
     bool visible;
 } ssc_result;
 
