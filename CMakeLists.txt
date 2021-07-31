@@ -40,3 +40,5 @@ endforeach( OUTPUTCONFIG TYPES )
 add_executable(test_spa "src/spa.c" "src/spa_tester.c")
 target_link_libraries(test_spa PUBLIC ${EXTRA_LIBS})
 add_test (NAME test_spa COMMAND test_spa)
+
+add_executable(main "src/spa.c" "src/ssc.c")
