@@ -4,13 +4,9 @@
 //  Created by Jacob Halsey on 31/07/2021.
 //
 #include "ssc.h"
+#include "util.h"
 #include <assert.h>
-#include <time.h>
 #include <tinytest.h>
-
-#ifdef _WIN32
-#define timegm _mkgmtime
-#endif
 
 #define ACCURACY_SECONDS 60
 
@@ -22,26 +18,6 @@ static inline bool test_times(unix_t expected, unix_t actual) {
     ASSERT("Sunrise correct", test_times(r, result.rise));                                                             \
     ASSERT("Sunset correct", test_times(s, result.set));                                                               \
     ASSERT_EQUALS(v, result.visible)
-
-#define BRISTOL_LAT 51.4545
-#define BRISTOL_LON -2.5879
-
-#define STLOUIS_LAT 38.6272
-#define STLOUIS_LON -90.1978
-
-#define SVALBARD_LAT 79.0
-#define SVALBARD_LON 17.0
-
-static time_t time_t_for_time(int year, int month, int day, int hours, int mins) {
-    struct tm tm;
-    tm.tm_year = year - 1900;
-    tm.tm_mon = month - 1;
-    tm.tm_mday = day;
-    tm.tm_hour = hours;
-    tm.tm_min = mins;
-    tm.tm_sec = 0;
-    return timegm(&tm);
-}
 
 // Check that time_t is unix time on this platform, otherwise the other tests won't work
 static void test_platform() {
