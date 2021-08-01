@@ -2,7 +2,8 @@
 
 [![Build status](https://github.com/jacob-pro/sunrise-sunset-calculator/actions/workflows/cmake.yml/badge.svg)](https://github.com/jacob-pro/sunrise-sunset-calculator/actions)
 
-A C99 library for computing sunrise and sunset times. Builds are tested on Linux/GCC and Windows/MSVC.
+A C99 library for computing sunrise and sunset times. Builds are tested on Linux/GCC, Windows/MSVC and MacOS/Clang,
+and there is also support for nostdlib environments.
 
 ## Usage
 

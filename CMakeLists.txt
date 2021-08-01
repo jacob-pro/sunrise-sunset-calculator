@@ -28,6 +28,17 @@ set(SOURCES
 add_library(ssc ${SOURCES})
 target_link_libraries(ssc PUBLIC ${EXTRA_LIBS})
 
+# The same library but try building it without stdlib
+if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
+ add_library(ssc_nostdlib ${SOURCES})
+ target_compile_options(ssc_nostdlib PUBLIC "-nostdlib")
+ add_executable(ssc_nostdlib_test "test/nostdlib.c")
+ target_link_libraries(ssc_nostdlib_test PUBLIC ssc_nostdlib)
+ target_link_libraries(ssc_nostdlib_test PUBLIC ${EXTRA_LIBS})
+ target_link_options(ssc_nostdlib_test PUBLIC "-nostdlib")
+endif()
+
+
 set(TYPES ${CMAKE_CONFIGURATION_TYPES})
 list(TRANSFORM TYPES PREPEND _)
 list(APPEND TYPES "")
