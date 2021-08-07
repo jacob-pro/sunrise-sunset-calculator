@@ -33,3 +33,8 @@ the horizon. We then use interval bisection to find the point at which the sun's
 
 It will work at all latitudes on Earth, although the step size option controls the shortest day/night lengths that
 will be detected, which is configured with a reasonable default based on the input latitude.
+
+## License
+
+All my work is LGPL, but the `spa.c` has its own separate license, so take this into account.
+

@@ -1,10 +1,2 @@
-cmake-build-debug*/
 .idea/
-CMakeFiles/
-cmake_install.cmake
-CMakeCache.txt
-CTestTestfile.cmake
-*.a
-Makefile
-Testing/
-*.exe
+.vs/
