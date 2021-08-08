@@ -34,7 +34,7 @@ typedef enum {
     SpaStatus_InvalidLongitude = 9,
     SpaStatus_InvalidLatitude = 10,
     SpaStatus_InvalidAtmosRefract = 16,
-    SpaStatus_InvalidElevation = 16,
+    SpaStatus_InvalidElevation = 11,
 } SpaStatus;
 
 typedef struct {

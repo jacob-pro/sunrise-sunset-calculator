@@ -2,6 +2,7 @@
 //  ssc.h
 //  Sunrise Sunset Calculator
 //  Created by Jacob Halsey on 31/07/2021.
+//  Distributed under the terms of the LGPL-3.0
 //
 #ifndef SUNRISE_SUNSET_CALCULATOR_SSC_H
 #define SUNRISE_SUNSET_CALCULATOR_SSC_H
@@ -40,6 +41,6 @@ typedef struct {
     bool visible;
 } ssc_result;
 
-SpaStatus ssc(ssc_input *input, ssc_result *result);
+SpaStatus ssc(const ssc_input *input, ssc_result *result);
 
 #endif //SUNRISE_SUNSET_CALCULATOR_SSC_H

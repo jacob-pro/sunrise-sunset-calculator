@@ -2,6 +2,7 @@
 //  test_ssc.c
 //  Sunrise Sunset Calculator
 //  Created by Jacob Halsey on 31/07/2021.
+//  Distributed under the terms of the LGPL-3.0
 //
 #include "ssc.h"
 #include "util.h"

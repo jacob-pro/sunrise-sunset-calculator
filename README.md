@@ -1,9 +1,12 @@
 # Sunrise Sunset Calculator
 
 [![Build status](https://github.com/jacob-pro/sunrise-sunset-calculator/actions/workflows/cmake.yml/badge.svg)](https://github.com/jacob-pro/sunrise-sunset-calculator/actions)
+[![Rust status](https://github.com/jacob-pro/sunrise-sunset-calculator/actions/workflows/rust.yml/badge.svg)](https://github.com/jacob-pro/sunrise-sunset-calculator/actions/workflows/cmake.yml)
 
 A C99 library for computing sunrise and sunset times. Builds are tested on Linux/GCC, Windows/MSVC and MacOS/Clang,
 and there is also support for nostdlib environments.
+
+Rust bindings are also [available](./rust-bindings/).
 
 ## Usage
 
@@ -36,5 +39,5 @@ will be detected, which is configured with a reasonable default based on the inp
 
 ## License
 
-All my work is LGPL, but the `spa.c` has its own separate license, so take this into account.
+All my code is LGPL, but the NREL algorithm this bundles has its own separate license, so take this into account.
 

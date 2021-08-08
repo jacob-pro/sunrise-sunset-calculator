@@ -2,6 +2,7 @@
 //  ssc.c
 //  Sunrise Sunset Calculator
 //  Created by Jacob Halsey on 31/07/2021.
+//  Distributed under the terms of the LGPL-3.0
 //
 #include "ssc.h"
 #define _USE_MATH_DEFINES
@@ -64,7 +65,7 @@ static int search_for_event(spa_data *data, unix_t start, int64_t step_size, boo
     return 0;
 }
 
-SpaStatus ssc(ssc_input *input, ssc_result *result) {
+SpaStatus ssc(const ssc_input *input, ssc_result *result) {
     spa_data data;
     int spa_result;
 
