@@ -6,6 +6,10 @@
 
 A crate that binds to the Sunrise Sunset Calculator C library, providing an idiomatic Rust interface.
 
+If you are using IntelliJ Rust don't forget to enable `include!` 
+[macro support](https://blog.jetbrains.com/rust/2021/04/08/intellij-rust-updates-for-2021-1/#proc-macros) 
+to get code completion.
+
 ## Safety
 
 This crate uses the `unsafe` keyword is used because it links to a C implementation. However the C library itself does 
