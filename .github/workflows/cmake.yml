@@ -52,8 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - if: ${{ matrix.os == 'ubuntu-latest' }}
-        uses: DoozyX/clang-format-lint-action@v0.12
+      - uses: DoozyX/clang-format-lint-action@v0.12
         name: clang-format
         with:
           source: 'src/include src/src src/test'
