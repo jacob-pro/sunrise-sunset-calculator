@@ -32,6 +32,7 @@ jobs:
         working-directory: ./rust-bindings
 
       - name: no_std
+        if: ${{ matrix.os != 'macos-latest' }}
         run: cargo build --no-default-features
         working-directory: ./rust-bindings
 
