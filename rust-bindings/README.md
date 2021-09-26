@@ -1,14 +1,10 @@
 # Sunrise Sunset Calculator Rust Bindings
 
-[![Build status](https://github.com/jacob-pro/sunrise-sunset-calculator/actions/workflows/rust.yml/badge.svg)](https://github.com/jacob-pro/sunrise-sunset-calculator/actions/workflows/cmake.yml)
+[![Build status](https://github.com/jacob-pro/sunrise-sunset-calculator/actions/workflows/rust.yml/badge.svg)](https://github.com/jacob-pro/sunrise-sunset-calculator/actions/workflows/rust.yml)
 [![crates.io](https://img.shields.io/crates/v/sunrise-sunset-calculator.svg)](https://crates.io/crates/sunrise-sunset-calculator)
 [![docs.rs](https://docs.rs/sunrise-sunset-calculator/badge.svg)](https://docs.rs/crate/sunrise-sunset-calculator)
 
 A crate that binds to the Sunrise Sunset Calculator C library, providing an idiomatic Rust interface.
-
-If you are using IntelliJ Rust don't forget to enable `include!` 
-[macro support](https://blog.jetbrains.com/rust/2021/04/08/intellij-rust-updates-for-2021-1/#proc-macros) 
-to get code completion.
 
 ## Safety
 

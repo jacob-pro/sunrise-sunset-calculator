@@ -5,9 +5,7 @@
 #[allow(non_snake_case)]
 #[allow(dead_code)]
 #[link(name = "ssc")]
-pub mod binding {
-    include!(concat!(env!("OUT_DIR"), "/ssc.rs"));
-}
+pub mod binding;
 
 use err_derive::Error;
 use num_derive::FromPrimitive;

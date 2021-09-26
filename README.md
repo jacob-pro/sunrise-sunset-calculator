@@ -6,7 +6,7 @@
 A C99 library for computing sunrise and sunset times. Builds are tested on Linux/GCC, Windows/MSVC and MacOS/Clang,
 and there is also support for nostdlib environments.
 
-Rust bindings are also [available](./rust-bindings/).
+Rust bindings are also [available](https://github.com/jacob-pro/sunrise-sunset-calculator/tree/master/rust-bindings).
 
 ## Usage
 
