@@ -9,8 +9,9 @@
 #include <math.h>
 
 // This is approximate - goal here is too have large as possible step size without missing a rise/set
+// http://time.unitarium.com/events/shortest-day.html
 static uint32_t default_step_size(double latitude) {
-    double shortest_day_hours_approx = (24.0 / M_PI) * acos(latitude / 66.0);
+    double shortest_day_hours_approx = (24.0 / M_PI) * acos(fabs(latitude) / 66.0);
     int64_t seconds = (int64_t) (shortest_day_hours_approx * 3600) - 1800;
     if (seconds < 600 || fabs(latitude) > 66.0) {
         seconds = 600;
@@ -43,9 +44,9 @@ static inline bool sun_is_up(spa_data *result) {
     return result->e >= -0.8333;
 }
 
-#define ENSURE_SPA_RESULT                                                                                              \
-    if (spa_result != SpaStatus_Success) {                                                                             \
-        return spa_result;                                                                                             \
+#define ENSURE_SPA_RESULT(res)                                                                                         \
+    if (res != SpaStatus_Success) {                                                                                    \
+        return res;                                                                                                    \
     }
 
 static int search_for_event(spa_data *data, unix_t start, int64_t step_size, bool target_upness, unix_t *result) {
@@ -53,7 +54,7 @@ static int search_for_event(spa_data *data, unix_t start, int64_t step_size, boo
     while (step_size != 0) {
         data->jd = jd_from_unix(start);
         spa_result = spa_calculate(data);
-        ENSURE_SPA_RESULT;
+        ENSURE_SPA_RESULT(spa_result);
         if (sun_is_up(data) == target_upness) {
             step_size = -(step_size / 2);
             target_upness = !target_upness;
@@ -79,7 +80,7 @@ SpaStatus ssc(const ssc_input *input, ssc_result *result) {
     data.temperature = input->temperature;
     data.atmos_refract = input->atmos_refract;
     spa_result = spa_calculate(&data);
-    if (spa_result) return spa_result;
+    ENSURE_SPA_RESULT(spa_result);
     result->visible = sun_is_up(&data);
 
     unix_t *backward_time = result->visible ? &result->rise : &result->set;
@@ -87,9 +88,9 @@ SpaStatus ssc(const ssc_input *input, ssc_result *result) {
     int64_t step_signed = (int64_t) input->step_size;
 
     spa_result = search_for_event(&data, input->time, -step_signed, !result->visible, backward_time);
-    ENSURE_SPA_RESULT;
+    ENSURE_SPA_RESULT(spa_result);
     spa_result = search_for_event(&data, input->time, step_signed, !result->visible, forward_time);
-    ENSURE_SPA_RESULT;
+    ENSURE_SPA_RESULT(spa_result);
 
     return SpaStatus_Success;
 }

@@ -34,4 +34,7 @@ static time_t time_t_for_time(int year, int month, int day, int hours, int mins)
 #define SVALBARD_LAT 79.0
 #define SVALBARD_LON 17.0
 
+#define ADELAIDE_LAT -34.92
+#define ADELAIDE_LON 138.59
+
 #endif //SUNRISE_SUNSET_CALCULATOR_UTIL_H
