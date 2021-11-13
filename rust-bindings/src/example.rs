@@ -1,14 +1,13 @@
 use anyhow::anyhow;
 use chrono::{Local, TimeZone};
-use clap::{AppSettings, Clap};
+use clap::Parser;
 use geocoding::{Forward, Openstreetmap};
 // The way in which we link to this is important
 // https://stackoverflow.com/a/64366809/7547647
 use sunrise_sunset_calculator::*;
 
-#[derive(Clap)]
+#[derive(Parser)]
 #[clap(version = "1.0", author = "Jacob Halsey <jacob@jhalsey.com>")]
-#[clap(setting = AppSettings::ColoredHelp)]
 struct Opts {
     #[clap(subcommand)]
     location: Location,
@@ -21,7 +20,7 @@ struct Opts {
     time: Option<String>,
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 enum Location {
     #[clap(about = "Use a pair of coordinates")]
     Coords(Coordinates),
@@ -29,7 +28,7 @@ enum Location {
     Lookup(Lookup),
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 struct Coordinates {
     #[clap(long = "lat", value_name = "Latitude")]
     latitude: f64,
@@ -37,7 +36,7 @@ struct Coordinates {
     longitude: f64,
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 struct Lookup {
     #[clap(
         short,
