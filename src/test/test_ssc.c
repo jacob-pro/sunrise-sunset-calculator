@@ -92,10 +92,10 @@ static void test_adelaide() {
     ssc_result result;
     SpaStatus status;
 
-    uint32_t tz = (uint32_t) (10.5 * 60 * 60);   // UTC+10:30
-    time_t sets = time_t_for_time(2021, 11, 13, 19, 57) - tz;  // 19:57 sunset
+    uint32_t tz = (uint32_t) (10.5 * 60 * 60);                // UTC+10:30
+    time_t sets = time_t_for_time(2021, 11, 13, 19, 57) - tz; // 19:57 sunset
     time_t mid = time_t_for_time(2021, 11, 13, 19, 00) - tz;  // evening
-    time_t rose = time_t_for_time(2021, 11, 13, 6, 03) - tz; // 6:03 rose
+    time_t rose = time_t_for_time(2021, 11, 13, 6, 03) - tz;  // 6:03 rose
     ssc_input_defaults(&input, mid, ADELAIDE_LAT, ADELAIDE_LON);
     status = ssc(&input, &result);
     ASSERT_EQUALS(SpaStatus_Success, status);
