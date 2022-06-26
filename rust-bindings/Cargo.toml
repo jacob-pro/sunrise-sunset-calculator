@@ -1,12 +1,12 @@
 [package]
 name = "sunrise-sunset-calculator"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Jacob Halsey <jacob@jhalsey.com>"]
 edition = "2018"
 build = "build.rs"
 repository = "https://github.com/jacob-pro/sunrise-sunset-calculator"
 homepage = "https://github.com/jacob-pro/sunrise-sunset-calculator"
-license = "LGPL-3.0"
+license-file = "LICENSE"
 description = "Rust Bindings to the Sunrise Sunset Calculator C Library"
 links = "ssc"
 
@@ -22,7 +22,7 @@ cmake = "0.1"
 [dev-dependencies]
 anyhow = "1.0"
 chrono = "0.4"
-clap = "3.0.0-beta.5"
+clap = { version = "3.2.6", features = ["derive"] }
 geocoding = "0.3.1"
 
 [features]

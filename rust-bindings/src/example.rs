@@ -7,24 +7,20 @@ use geocoding::{Forward, Openstreetmap};
 use sunrise_sunset_calculator::*;
 
 #[derive(Parser)]
-#[clap(version = "1.0", author = "Jacob Halsey <jacob@jhalsey.com>")]
+#[clap(author, version, about)]
 struct Opts {
     #[clap(subcommand)]
     location: Location,
-    #[clap(
-        short,
-        long,
-        value_name = "Time",
-        about = "Enter a time to compute at in format: 'YYYY-MM-DD HH:MM' (default is now)"
-    )]
+    /// Enter a time to compute at in format: 'YYYY-MM-DD HH:MM' (default is now)
+    #[clap(short, long, value_name = "Time")]
     time: Option<String>,
 }
 
 #[derive(Parser)]
 enum Location {
-    #[clap(about = "Use a pair of coordinates")]
+    /// Use a pair of coordinates
     Coords(Coordinates),
-    #[clap(about = "Lookup a location using Openstreetmap")]
+    /// Lookup a location using Openstreetmap
     Lookup(Lookup),
 }
 
@@ -38,12 +34,8 @@ struct Coordinates {
 
 #[derive(Parser)]
 struct Lookup {
-    #[clap(
-        short,
-        long,
-        value_name = "Location",
-        about = "Enter a location to search for"
-    )]
+    /// Enter a location to search for
+    #[clap(short, long, value_name = "Location")]
     location: String,
 }
 

@@ -4,7 +4,6 @@
 #[allow(non_camel_case_types)]
 #[allow(non_snake_case)]
 #[allow(dead_code)]
-#[link(name = "ssc")]
 pub mod binding;
 
 use err_derive::Error;
