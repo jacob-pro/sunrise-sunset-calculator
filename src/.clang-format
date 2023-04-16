@@ -10,6 +10,6 @@ BinPackParameters: false
 PenaltyReturnTypeOnItsOwnLine: 100
 ReflowComments: false
 AllowShortIfStatementsOnASingleLine: WithoutElse
-# AlignArrayOfStructures: Left
+AlignArrayOfStructures: Left
 SpaceAfterCStyleCast: true
 ---

@@ -62,10 +62,7 @@ add_test(NAME test_ssc COMMAND test_ssc)
 add_executable(example "src/spa.c" "src/ssc.c" "test/ssc_example.c")
 target_link_libraries(example PUBLIC ${EXTRA_LIBS})
 
-# Code format helper tools
-file(GLOB ALL_C_SOURCE_FILES
-        include/*.[chi]
-        src/*.[chi]
-        test/*.[chi]
-        )
-add_custom_target(clang-format COMMAND clang-format-12 --style=file -i ${ALL_C_SOURCE_FILES})
+# Code formatting
+file(GLOB FORMAT_FILES include/ssc.h src/ssc.c test/nostdlib.c test/test_ssc.c test/ssc_example.c)
+add_custom_target(clang-format COMMAND clang-format --style=file -i ${FORMAT_FILES})
+add_test(NAME test_format COMMAND clang-format --style=file -i ${FORMAT_FILES} --dry-run --Werror)
