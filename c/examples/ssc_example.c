@@ -4,8 +4,8 @@
 //  Created by Jacob Halsey on 31/07/2021.
 //  Distributed under the terms of the LGPL-3.0
 //
+#include "../test/util.h"
 #include "ssc.h"
-#include "util.h"
 #include <assert.h>
 #include <stdio.h>
 

@@ -12,6 +12,6 @@ fn main() {
         .generate()
         .expect("Unable to generate bindings");
     bindings
-        .write_to_file("src/binding.rs")
+        .write_to_file("c/binding.rs")
         .expect("Couldn't write bindings!");
 }

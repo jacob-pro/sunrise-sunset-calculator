@@ -59,10 +59,10 @@ target_link_libraries(test_ssc PUBLIC ${EXTRA_LIBS})
 add_test(NAME test_ssc COMMAND test_ssc)
 
 # Demo Apps
-add_executable(example "src/spa.c" "src/ssc.c" "test/ssc_example.c")
-target_link_libraries(example PUBLIC ${EXTRA_LIBS})
+add_executable(examples "src/spa.c" "src/ssc.c" "examples/ssc_example.c")
+target_link_libraries(examples PUBLIC ${EXTRA_LIBS})
 
 # Code formatting
-file(GLOB FORMAT_FILES include/ssc.h src/ssc.c test/nostdlib.c test/test_ssc.c test/ssc_example.c)
+file(GLOB FORMAT_FILES include/ssc.h src/ssc.c test/nostdlib.c test/test_ssc.c examples/ssc_example.c)
 add_custom_target(clang-format COMMAND clang-format --style=file -i ${FORMAT_FILES})
 add_test(NAME test_format COMMAND clang-format --style=file -i ${FORMAT_FILES} --dry-run --Werror)
