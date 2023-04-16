@@ -59,8 +59,8 @@ target_link_libraries(test_ssc PUBLIC ${EXTRA_LIBS})
 add_test(NAME test_ssc COMMAND test_ssc)
 
 # Demo Apps
-add_executable(examples "src/spa.c" "src/ssc.c" "examples/ssc_example.c")
-target_link_libraries(examples PUBLIC ${EXTRA_LIBS})
+add_executable(example "src/spa.c" "src/ssc.c" "examples/ssc_example.c")
+target_link_libraries(example PUBLIC ${EXTRA_LIBS})
 
 # Code formatting
 file(GLOB FORMAT_FILES include/ssc.h src/ssc.c test/nostdlib.c test/test_ssc.c examples/ssc_example.c)

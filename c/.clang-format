@@ -7,6 +7,7 @@ AllowShortFunctionsOnASingleLine: Empty
 AlignAfterOpenBracket: Align
 BinPackArguments: false
 BinPackParameters: false
+AllowAllParametersOfDeclarationOnNextLine: false
 PenaltyReturnTypeOnItsOwnLine: 100
 ReflowComments: false
 AllowShortIfStatementsOnASingleLine: WithoutElse

@@ -7,8 +7,8 @@
 #include <ssc.h>
 void _start() {
     while (1) {
-        ssc_input input;
-        ssc_result result;
-        ssc(&input, &result);
+        SunriseSunsetParameters params;
+        SunriseSunsetResult result;
+        sunrise_sunset_calculate(&params, &result);
     }
 }
