@@ -8,89 +8,103 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-// This is approximate - goal here is too have large as possible step size without missing a rise/set
-// http://time.unitarium.com/events/shortest-day.html
-static uint32_t default_step_size(double latitude) {
-    double shortest_day_hours_approx = (24.0 / M_PI) * acos(fabs(latitude) / 66.0);
-    int64_t seconds = (int64_t) (shortest_day_hours_approx * 3600) - 1800;
-    if (seconds < 600 || fabs(latitude) > 66.0) {
-        seconds = 600;
+uint32_t sunrise_sunset_default_step_size(double latitude) {
+    double latitude_abs = fabs(latitude);
+    if (latitude_abs < 60.0) {
+        return 14400;
+    } else if (latitude_abs < 64.0) {
+        return 3600;
+    } else {
+        return 600;
     }
-    return (uint32_t) seconds;
 }
 
-void ssc_input_defaults(ssc_input *input, unix_t time, double latitude, double longitude) {
-    input->time = time;
-    input->latitude = latitude;
-    input->longitude = longitude;
-    input->delta_ut1 = 0.0;
-    input->delta_t = 0.0;
-    input->elevation = 0.0;
-    input->pressure = 1013.25;
-    input->temperature = 16.0;
-    input->atmos_refract = 0.5667;
-    input->step_size = default_step_size(latitude);
+void SunriseSunsetParameters_init(SunriseSunsetParameters *params, unix_t time, double latitude, double longitude) {
+    params->time = time;
+    params->latitude = latitude;
+    params->longitude = longitude;
+    params->delta_t = 0.0;
+    params->elevation = SSC_DEFAULT_ELEVATION;
+    params->pressure = SSC_DEFAULT_PRESSURE;
+    params->temperature = SSC_DEFAULT_TEMPERATURE;
+    params->atmos_refract = SSC_DEFAULT_ATMOSPHERIC_REFRACTION;
+    params->step_size = sunrise_sunset_default_step_size(latitude);
 }
 
-// https://stackoverflow.com/a/466348
+/// Convert a Unix timestamp to Julian Day
+/// @see <a href="https://stackoverflow.com/a/466348">Stack Overflow</a>
 static inline double jd_from_unix(unix_t t) {
-    return (t / 86400.0) + 2440587.5;
+    return ((double) t / 86400.0) + 2440587.5;
 }
 
-// See Skyfield's general purpose implementation this is inspired by:
-// https://github.com/skyfielders/python-skyfield/blob/aa59e2d4711c3a95804170889f138402edbf4237/skyfield/almanac.py#L216
-// https://github.com/skyfielders/python-skyfield/blob/aa59e2d4711c3a95804170889f138402edbf4237/skyfield/searchlib.py#L12
-static inline bool sun_is_up(spa_data *result) {
+/// Return true if the sun is currently visible
+/// @see <a href="https://github.com/skyfielders/python-skyfield/blob/aa59e2d4711c3a95804170889f138402edbf4237/skyfield/almanac.py#L239">Skyfield implementation</a>
+/// @param[in] result Results from solar position algorithm
+static inline bool sun_is_up(const spa_data *result) {
     return result->e >= -0.8333;
 }
 
 #define ENSURE_SPA_RESULT(res)                                                                                         \
-    if (res != SpaStatus_Success) {                                                                                    \
+    if (res != SpaError_Success) {                                                                                     \
         return res;                                                                                                    \
     }
 
-static int search_for_event(spa_data *data, unix_t start, int64_t step_size, bool target_upness, unix_t *result) {
+/// Find the next time when the solar visibility changes
+/// @param[in, out] data Solar position algorithm parameters
+/// @param start Unix timestamp to start search from
+/// @param step_size Step size in seconds. A negative step size will search backwards
+/// @param currently_visible True if the sun is currently visible at the start time
+/// @param[out] result Out parameter to store timestamp of next event
+/// @return SpaError code
+static SpaError search_for_change_in_visibility(spa_data *data,
+                                                unix_t start,
+                                                int64_t step_size,
+                                                bool currently_visible,
+                                                unix_t *result) {
     int spa_result;
     while (step_size != 0) {
         data->jd = jd_from_unix(start);
         spa_result = spa_calculate(data);
         ENSURE_SPA_RESULT(spa_result);
-        if (sun_is_up(data) == target_upness) {
+        if (sun_is_up(data) != currently_visible) {
             step_size = -(step_size / 2);
-            target_upness = !target_upness;
+            currently_visible = !currently_visible;
         } else {
             start += step_size;
         }
     }
     *result = start;
-    return 0;
+    return SpaError_Success;
 }
 
-SpaStatus ssc(const ssc_input *input, ssc_result *result) {
+SpaError sunrise_sunset_calculate(const SunriseSunsetParameters *params, SunriseSunsetResult *result) {
     spa_data data;
     int spa_result;
 
-    data.jd = jd_from_unix(input->time);
-    data.delta_ut1 = input->delta_ut1;
-    data.delta_t = input->delta_t;
-    data.longitude = input->longitude;
-    data.latitude = input->latitude;
-    data.elevation = input->elevation;
-    data.pressure = input->pressure;
-    data.temperature = input->temperature;
-    data.atmos_refract = input->atmos_refract;
+    data.jd = jd_from_unix(params->time);
+    data.delta_t = params->delta_t;
+    data.longitude = params->longitude;
+    data.latitude = params->latitude;
+    data.elevation = params->elevation;
+    data.pressure = params->pressure;
+    data.temperature = params->temperature;
+    data.atmos_refract = params->atmos_refract;
+
+    // Determine current visibility at start time
     spa_result = spa_calculate(&data);
     ENSURE_SPA_RESULT(spa_result);
     result->visible = sun_is_up(&data);
 
-    unix_t *backward_time = result->visible ? &result->rise : &result->set;
-    unix_t *forward_time = result->visible ? &result->set : &result->rise;
-    int64_t step_signed = (int64_t) input->step_size;
+    unix_t *backward_out = result->visible ? &result->rise : &result->set;
+    unix_t *forward_out = result->visible ? &result->set : &result->rise;
+    int64_t step_signed = (int64_t) params->step_size;
 
-    spa_result = search_for_event(&data, input->time, -step_signed, !result->visible, backward_time);
+    // Search backwards from start time
+    spa_result = search_for_change_in_visibility(&data, params->time, -step_signed, result->visible, backward_out);
     ENSURE_SPA_RESULT(spa_result);
-    spa_result = search_for_event(&data, input->time, step_signed, !result->visible, forward_time);
+    // Search forwards from start time
+    spa_result = search_for_change_in_visibility(&data, params->time, step_signed, result->visible, forward_out);
     ENSURE_SPA_RESULT(spa_result);
 
-    return SpaStatus_Success;
+    return SpaError_Success;
 }

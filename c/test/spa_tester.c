@@ -24,8 +24,6 @@
 //   1617 Cole Blvd, Golden, CO 80401      //
 /////////////////////////////////////////////
 
-// File
-
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -41,7 +39,6 @@ int main()
 {
     spa_data spa;
     spa.jd            = 2452930.312847;  /* 2003-10-17 12:30:30 (-7) */
-    spa.delta_ut1     = 0;
     spa.delta_t       = 67;
     spa.longitude     = -105.1786;
     spa.latitude      = 39.742476;
@@ -51,7 +48,7 @@ int main()
     spa.atmos_refract = 0.5667;
 
     int result = spa_calculate(&spa);
-    assert(result == SpaStatus_Success);
+    assert(result == SpaError_Success);
 
     printf("Julian Day:    %.6f\n",spa.jd);
     printf("L:             %.6e degrees\n",spa.l);

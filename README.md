@@ -17,10 +17,10 @@ equivalent to `time_t` so you can just use the C time functions to work with dat
 ```
 #include "ssc.h"
 ...
-ssc_input input;
-ssc_result result;
-ssc_input_defaults(&input, UNIX_TIMESTAMP, LATITUDE, LONGITUDE);
-assert(ssc(&input, &result) == SpaStatus_Success);
+SunriseSunsetParameters params;
+SunriseSunsetResult result;
+SunriseSunsetParameters_init(&params, UNIX_TIMESTAMP, LATITUDE, LONGITUDE);
+assert(sunrise_sunset_calculate(&input, &result) == SpaStatus_Success);
 printf("Visible: %s, Sunset: %lld, Sunrise: %lld", result.visible ? "true" : "false", result.set, result.rise);
 ```
 
@@ -40,4 +40,3 @@ will be detected, which is configured with a reasonable default based on the inp
 ## License
 
 All my code is LGPL, but the NREL algorithm this bundles has its own separate license, so take this into account.
-

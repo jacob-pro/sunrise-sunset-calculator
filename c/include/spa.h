@@ -28,17 +28,16 @@
 #define __solar_position_algorithm_header
 
 typedef enum {
-    SpaStatus_Success = 0,
-    SpaStatus_UnsupportedDate = 1,
-    SpaStatus_InvalidPressure = 12,
-    SpaStatus_InvalidTemperature = 13,
-    SpaStatus_InvalidDeltaUt1 = 17,
-    SpaStatus_InvalidDeltaT = 7,
-    SpaStatus_InvalidLongitude = 9,
-    SpaStatus_InvalidLatitude = 10,
-    SpaStatus_InvalidAtmosRefract = 16,
-    SpaStatus_InvalidElevation = 11,
-} SpaStatus;
+    SpaError_Success = 0,
+    SpaError_UnsupportedDate = 1,
+    SpaError_InvalidPressure = 12,
+    SpaError_InvalidTemperature = 13,
+    SpaError_InvalidDeltaT = 7,
+    SpaError_InvalidLongitude = 9,
+    SpaError_InvalidLatitude = 10,
+    SpaError_InvalidAtmosRefract = 16,
+    SpaError_InvalidElevation = 11,
+} SpaError;
 
 typedef struct
 {
@@ -46,12 +45,6 @@ typedef struct
 
     double jd;           // Julian day
 
-    double delta_ut1;    // Fractional second difference between UTC and UT which is used
-	                     // to adjust UTC for earth's irregular rotation rate and is derived
-	                     // from observation only and is reported in this bulletin:
-	                     // http://maia.usno.navy.mil/ser7/ser7.dat,
-	                     // where delta_ut1 = DUT1
-	                     // valid range: -1 to 1 second (exclusive), error code 17
 
     double delta_t;      // Difference between earth rotation time and terrestrial time
                          // It is derived from observation only and is reported in this
@@ -126,6 +119,6 @@ typedef struct
 
 } spa_data;
 
-SpaStatus spa_calculate(spa_data *spa);
+SpaError spa_calculate(spa_data *spa);
 
 #endif

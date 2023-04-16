@@ -11,15 +11,15 @@
 
 // Run with Environment TZ=CST6CDT for local time
 int main() {
-    ssc_input input;
-    ssc_result result;
+    SunriseSunsetParameters input;
+    SunriseSunsetResult result;
 
     time_t start = time_t_for_time(2021, 7, 28, 22, 0);
     time_t end = time_t_for_time(2021, 7, 29, 14, 0);
 
     while (start <= end) {
-        ssc_input_defaults(&input, start, STLOUIS_LAT, STLOUIS_LON);
-        assert(ssc(&input, &result) == SpaStatus_Success);
+        SunriseSunsetParameters_init(&input, start, STLOUIS_LAT, STLOUIS_LON);
+        assert(sunrise_sunset_calculate(&input, &result) == SpaError_Success);
 
         char strNow[100];
         struct tm *local = localtime(&start);

@@ -27,45 +27,45 @@ static void test_platform() {
 }
 
 static void test_bristol() {
-    ssc_input input;
-    ssc_result result;
-    SpaStatus status;
+    SunriseSunsetParameters input;
+    SunriseSunsetResult result;
+    SpaError status;
 
     //Early morning of Monday 18th, Sun is not visible. It set at 16:17 the day before, and is due to rise at 7:35
     time_t set18 = time_t_for_time(2018, 11, 18, 16, 17);  // 16:17 Sunset
     time_t early19 = time_t_for_time(2018, 11, 19, 5, 30); // 5:30 Early morning
     time_t rise19 = time_t_for_time(2018, 11, 19, 7, 35);  // 7:35 Sunrise
-    ssc_input_defaults(&input, early19, BRISTOL_LAT, BRISTOL_LON);
-    status = ssc(&input, &result);
-    ASSERT_EQUALS(SpaStatus_Success, status);
+    SunriseSunsetParameters_init(&input, early19, BRISTOL_LAT, BRISTOL_LON);
+    status = sunrise_sunset_calculate(&input, &result);
+    ASSERT_EQUALS(SpaError_Success, status);
     ASSERT_VALID_RESULT(result, rise19, set18, false);
 
     //In the middle of Monday 18th, Sun is visible. It should have risen at 7:35 and be due to set at 16:16
     time_t midday19 = time_t_for_time(2018, 11, 19, 12, 0); // 12:00 Midday
     time_t set19 = time_t_for_time(2018, 11, 19, 16, 16);   // 16:16 Sunset
-    ssc_input_defaults(&input, midday19, BRISTOL_LAT, BRISTOL_LON);
-    status = ssc(&input, &result);
-    ASSERT_EQUALS(SpaStatus_Success, status);
+    SunriseSunsetParameters_init(&input, midday19, BRISTOL_LAT, BRISTOL_LON);
+    status = sunrise_sunset_calculate(&input, &result);
+    ASSERT_EQUALS(SpaError_Success, status);
     ASSERT_VALID_RESULT(result, rise19, set19, true);
 
     //In the evening of Monday 18th, Sun is not visible. It should have set at 16:16 and be due to rise tomorrow at 7:36
     time_t late19 = time_t_for_time(2018, 11, 19, 20, 25); // 20:25 Evening
     time_t rise20 = time_t_for_time(2018, 11, 20, 7, 36);  // 7:36 Sunrise
-    ssc_input_defaults(&input, late19, BRISTOL_LAT, BRISTOL_LON);
-    status = ssc(&input, &result);
-    ASSERT_EQUALS(SpaStatus_Success, status);
+    SunriseSunsetParameters_init(&input, late19, BRISTOL_LAT, BRISTOL_LON);
+    status = sunrise_sunset_calculate(&input, &result);
+    ASSERT_EQUALS(SpaError_Success, status);
     ASSERT_VALID_RESULT(result, rise20, set19, false);
 }
 
 static void test_outer_bounds_impl(time_t start, double lat, double lon, unsigned int days, unsigned int incr) {
     time_t end = start + (days * 24 * 60 * 60);
-    ssc_input input;
-    ssc_result result;
-    SpaStatus status;
+    SunriseSunsetParameters input;
+    SunriseSunsetResult result;
+    SpaError status;
     while (start <= end) {
-        ssc_input_defaults(&input, start, lat, lon);
-        status = ssc(&input, &result);
-        ASSERT_EQUALS(SpaStatus_Success, status);
+        SunriseSunsetParameters_init(&input, start, lat, lon);
+        status = sunrise_sunset_calculate(&input, &result);
+        ASSERT_EQUALS(SpaError_Success, status);
         ASSERT("Bounded",
                ((result.rise <= start) && (start <= result.set)) || ((result.set <= start) && (start <= result.rise)));
         ASSERT_EQUALS((start > result.rise), result.visible);
@@ -88,17 +88,17 @@ static void test_outer_bounds() {
 }
 
 static void test_adelaide() {
-    ssc_input input;
-    ssc_result result;
-    SpaStatus status;
+    SunriseSunsetParameters input;
+    SunriseSunsetResult result;
+    SpaError status;
 
     uint32_t tz = (uint32_t) (10.5 * 60 * 60);                // UTC+10:30
     time_t sets = time_t_for_time(2021, 11, 13, 19, 57) - tz; // 19:57 sunset
     time_t mid = time_t_for_time(2021, 11, 13, 19, 00) - tz;  // evening
     time_t rose = time_t_for_time(2021, 11, 13, 6, 03) - tz;  // 6:03 rose
-    ssc_input_defaults(&input, mid, ADELAIDE_LAT, ADELAIDE_LON);
-    status = ssc(&input, &result);
-    ASSERT_EQUALS(SpaStatus_Success, status);
+    SunriseSunsetParameters_init(&input, mid, ADELAIDE_LAT, ADELAIDE_LON);
+    status = sunrise_sunset_calculate(&input, &result);
+    ASSERT_EQUALS(SpaError_Success, status);
     ASSERT_VALID_RESULT(result, rose, sets, true);
 }
 

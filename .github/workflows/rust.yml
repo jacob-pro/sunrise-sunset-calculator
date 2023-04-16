@@ -39,6 +39,6 @@ jobs:
         run: cargo install cargo-sort && cargo-sort --check
         working-directory: ./rust-bindings
 
-#      - name: Cargo Clippy Check
-#        run: cargo clippy --all-features --workspace -- -D warnings
-#        working-directory: ./rust-bindings
+      - name: Cargo Clippy Check
+        run: cargo clippy --all-features --workspace -- -D warnings
+        working-directory: ./rust-bindings

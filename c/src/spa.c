@@ -498,19 +498,18 @@ static double third_order_polynomial(double a, double b, double c, double d, dou
 static int validate_inputs(spa_data *spa)
 {
     // Less than -2000-01-01 00:00 or Greater than 6000-12-31 23:59:59
-    if ((spa->jd < 990575.50000) || (spa->jd > 3912880.49999)) return SpaStatus_UnsupportedDate;
+    if ((spa->jd < 990575.50000) || (spa->jd > 3912880.49999)) return SpaError_UnsupportedDate;
 
-    if ((spa->pressure < 0) || (spa->pressure > 5000)) return SpaStatus_InvalidPressure;
-    if ((spa->temperature <= -273) || (spa->temperature > 6000)) return SpaStatus_InvalidTemperature;
-    if ((spa->delta_ut1 <= -1) || (spa->delta_ut1 >= 1)) return SpaStatus_InvalidDeltaUt1;
+    if ((spa->pressure < 0) || (spa->pressure > 5000)) return SpaError_InvalidPressure;
+    if ((spa->temperature <= -273) || (spa->temperature > 6000)) return SpaError_InvalidTemperature;
 
-    if (fabs(spa->delta_t) > 8000) return SpaStatus_InvalidDeltaT;
-    if (fabs(spa->longitude) > 180) return SpaStatus_InvalidLongitude;
-    if (fabs(spa->latitude) > 90) return SpaStatus_InvalidLatitude;
-    if (fabs(spa->atmos_refract) > 5) return SpaStatus_InvalidAtmosRefract;
-    if (spa->elevation < -6500000) return SpaStatus_InvalidElevation;
+    if (fabs(spa->delta_t) > 8000) return SpaError_InvalidDeltaT;
+    if (fabs(spa->longitude) > 180) return SpaError_InvalidLongitude;
+    if (fabs(spa->latitude) > 90) return SpaError_InvalidLatitude;
+    if (fabs(spa->atmos_refract) > 5) return SpaError_InvalidAtmosRefract;
+    if (spa->elevation < -6500000) return SpaError_InvalidElevation;
 
-    return SpaStatus_Success;
+    return SpaError_Success;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -819,13 +818,13 @@ void calculate_geocentric_sun_right_ascension_and_declination(spa_data *spa)
 // Calculate all SPA parameters and put into structure
 // Note: All inputs values (listed in header file) must already be in structure
 ///////////////////////////////////////////////////////////////////////////////////////////
-SpaStatus spa_calculate(spa_data *spa)
+SpaError spa_calculate(spa_data *spa)
 {
-    SpaStatus result;
+    SpaError result;
 
     result = validate_inputs(spa);
 
-    if (result == SpaStatus_Success)
+    if (result == SpaError_Success)
     {
         calculate_geocentric_sun_right_ascension_and_declination(spa);
 
