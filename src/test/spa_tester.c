@@ -1,3 +1,8 @@
+//
+//  spa_tester.c
+//  https://midcdmz.nrel.gov/spa/spa_tester.c
+//  Modified for use in sunrise-sunset-calculator
+//
 
 /////////////////////////////////////////////
 //          SPA TESTER for SPA.C           //
@@ -19,42 +24,43 @@
 //   1617 Cole Blvd, Golden, CO 80401      //
 /////////////////////////////////////////////
 
-// File modified by Jacob Halsey for use in sunrise-sunset-calculator
+// File
 
-#include "spa.h"
 #include <assert.h>
 #include <math.h>
-#include <stdbool.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include "spa.h"
 
 static bool test_double(double expected, double actual) {
     double error = fabs(expected - actual) / expected;
     return error < 1.0e-5;
 }
 
-int main() {
+int main()
+{
     spa_data spa;
-    spa.jd = 2452930.312847; // 2003-10-17 12:30:30 (-7)
-    spa.delta_ut1 = 0;
-    spa.delta_t = 67;
-    spa.longitude = -105.1786;
-    spa.latitude = 39.742476;
-    spa.elevation = 1830.14;
-    spa.pressure = 820;
-    spa.temperature = 11;
+    spa.jd            = 2452930.312847;  /* 2003-10-17 12:30:30 (-7) */
+    spa.delta_ut1     = 0;
+    spa.delta_t       = 67;
+    spa.longitude     = -105.1786;
+    spa.latitude      = 39.742476;
+    spa.elevation     = 1830.14;
+    spa.pressure      = 820;
+    spa.temperature   = 11;
     spa.atmos_refract = 0.5667;
 
     int result = spa_calculate(&spa);
     assert(result == SpaStatus_Success);
 
-    printf("Julian Day:    %.6f\n", spa.jd);
-    printf("L:             %.6e degrees\n", spa.l);
-    printf("B:             %.6e degrees\n", spa.b);
-    printf("R:             %.6f AU\n", spa.r);
-    printf("H:             %.6f degrees\n", spa.h);
-    printf("Delta Psi:     %.6e degrees\n", spa.del_psi);
-    printf("Delta Epsilon: %.6e degrees\n", spa.del_epsilon);
-    printf("Epsilon:       %.6f degrees\n", spa.epsilon);
+    printf("Julian Day:    %.6f\n",spa.jd);
+    printf("L:             %.6e degrees\n",spa.l);
+    printf("B:             %.6e degrees\n",spa.b);
+    printf("R:             %.6f AU\n",spa.r);
+    printf("H:             %.6f degrees\n",spa.h);
+    printf("Delta Psi:     %.6e degrees\n",spa.del_psi);
+    printf("Delta Epsilon: %.6e degrees\n",spa.del_epsilon);
+    printf("Epsilon:       %.6f degrees\n",spa.epsilon);
 
     assert(test_double(2.401826e+01, spa.l));
     assert(test_double(-1.011219e-04, spa.b));

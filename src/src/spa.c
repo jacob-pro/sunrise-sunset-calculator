@@ -1,3 +1,8 @@
+//
+//  spa.c
+//  https://midcdmz.nrel.gov/spa/
+//  Modified for use in sunrise-sunset-calculator
+//
 
 /////////////////////////////////////////////
 //      Solar Position Algorithm (SPA)     //
@@ -63,12 +68,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-// File modified by Jacob Halsey for use in sunrise-sunset-calculator
-
-#include "spa.h"
 #include <math.h>
+#include "spa.h"
 
-#define PI 3.1415926535897932384626433832795028841971
+#define PI         3.1415926535897932384626433832795028841971
 #define SUN_RADIUS 0.26667
 
 #define L_COUNT 6
@@ -80,17 +83,16 @@
 #define B_MAX_SUBCOUNT 5
 #define R_MAX_SUBCOUNT 40
 
-enum { TERM_A, TERM_B, TERM_C, TERM_COUNT };
-enum { TERM_X0, TERM_X1, TERM_X2, TERM_X3, TERM_X4, TERM_X_COUNT };
-enum { TERM_PSI_A, TERM_PSI_B, TERM_EPS_C, TERM_EPS_D, TERM_PE_COUNT };
+enum {TERM_A, TERM_B, TERM_C, TERM_COUNT};
+enum {TERM_X0, TERM_X1, TERM_X2, TERM_X3, TERM_X4, TERM_X_COUNT};
+enum {TERM_PSI_A, TERM_PSI_B, TERM_EPS_C, TERM_EPS_D, TERM_PE_COUNT};
 
 #define TERM_Y_COUNT TERM_X_COUNT
 
-const int l_subcount[L_COUNT] = {64, 34, 20, 7, 3, 1};
-const int b_subcount[B_COUNT] = {5, 2};
-const int r_subcount[R_COUNT] = {40, 10, 6, 2, 1};
+const int l_subcount[L_COUNT] = {64,34,20,7,3,1};
+const int b_subcount[B_COUNT] = {5,2};
+const int r_subcount[R_COUNT] = {40,10,6,2,1};
 
-// clang-format off
 ///////////////////////////////////////////////////
 ///  Earth Periodic Terms
 ///////////////////////////////////////////////////
@@ -327,117 +329,174 @@ const double R_TERMS[R_COUNT][R_MAX_SUBCOUNT][TERM_COUNT]=
     }
 };
 
-// clang-format on
 ////////////////////////////////////////////////////////////////
 ///  Periodic Terms for the nutation in longitude and obliquity
 ////////////////////////////////////////////////////////////////
 
-const int Y_TERMS[Y_COUNT][TERM_Y_COUNT] = {
-    {0, 0, 0, 0, 1},   {-2, 0, 0, 2, 2}, {0, 0, 0, 2, 2},  {0, 0, 0, 0, 2},   {0, 1, 0, 0, 0},   {0, 0, 1, 0, 0},
-    {-2, 1, 0, 2, 2},  {0, 0, 0, 2, 1},  {0, 0, 1, 2, 2},  {-2, -1, 0, 2, 2}, {-2, 0, 1, 0, 0},  {-2, 0, 0, 2, 1},
-    {0, 0, -1, 2, 2},  {2, 0, 0, 0, 0},  {0, 0, 1, 0, 1},  {2, 0, -1, 2, 2},  {0, 0, -1, 0, 1},  {0, 0, 1, 2, 1},
-    {-2, 0, 2, 0, 0},  {0, 0, -2, 2, 1}, {2, 0, 0, 2, 2},  {0, 0, 2, 2, 2},   {0, 0, 2, 0, 0},   {-2, 0, 1, 2, 2},
-    {0, 0, 0, 2, 0},   {-2, 0, 0, 2, 0}, {0, 0, -1, 2, 1}, {0, 2, 0, 0, 0},   {2, 0, -1, 0, 1},  {-2, 2, 0, 2, 2},
-    {0, 1, 0, 0, 1},   {-2, 0, 1, 0, 1}, {0, -1, 0, 0, 1}, {0, 0, 2, -2, 0},  {2, 0, -1, 2, 1},  {2, 0, 1, 2, 2},
-    {0, 1, 0, 2, 2},   {-2, 1, 1, 0, 0}, {0, -1, 0, 2, 2}, {2, 0, 0, 2, 1},   {2, 0, 1, 0, 0},   {-2, 0, 2, 2, 2},
-    {-2, 0, 1, 2, 1},  {2, 0, -2, 0, 1}, {2, 0, 0, 0, 1},  {0, -1, 1, 0, 0},  {-2, -1, 0, 2, 1}, {-2, 0, 0, 0, 1},
-    {0, 0, 2, 2, 1},   {-2, 0, 2, 0, 1}, {-2, 1, 0, 2, 1}, {0, 0, 1, -2, 0},  {-1, 0, 1, 0, 0},  {-2, 1, 0, 0, 0},
-    {1, 0, 0, 0, 0},   {0, 0, 1, 2, 0},  {0, 0, -2, 2, 2}, {-1, -1, 1, 0, 0}, {0, 1, 1, 0, 0},   {0, -1, 1, 2, 2},
-    {2, -1, -1, 2, 2}, {0, 0, 3, 2, 2},  {2, -1, 0, 2, 2},
+const int Y_TERMS[Y_COUNT][TERM_Y_COUNT]=
+{
+    {0,0,0,0,1},
+    {-2,0,0,2,2},
+    {0,0,0,2,2},
+    {0,0,0,0,2},
+    {0,1,0,0,0},
+    {0,0,1,0,0},
+    {-2,1,0,2,2},
+    {0,0,0,2,1},
+    {0,0,1,2,2},
+    {-2,-1,0,2,2},
+    {-2,0,1,0,0},
+    {-2,0,0,2,1},
+    {0,0,-1,2,2},
+    {2,0,0,0,0},
+    {0,0,1,0,1},
+    {2,0,-1,2,2},
+    {0,0,-1,0,1},
+    {0,0,1,2,1},
+    {-2,0,2,0,0},
+    {0,0,-2,2,1},
+    {2,0,0,2,2},
+    {0,0,2,2,2},
+    {0,0,2,0,0},
+    {-2,0,1,2,2},
+    {0,0,0,2,0},
+    {-2,0,0,2,0},
+    {0,0,-1,2,1},
+    {0,2,0,0,0},
+    {2,0,-1,0,1},
+    {-2,2,0,2,2},
+    {0,1,0,0,1},
+    {-2,0,1,0,1},
+    {0,-1,0,0,1},
+    {0,0,2,-2,0},
+    {2,0,-1,2,1},
+    {2,0,1,2,2},
+    {0,1,0,2,2},
+    {-2,1,1,0,0},
+    {0,-1,0,2,2},
+    {2,0,0,2,1},
+    {2,0,1,0,0},
+    {-2,0,2,2,2},
+    {-2,0,1,2,1},
+    {2,0,-2,0,1},
+    {2,0,0,0,1},
+    {0,-1,1,0,0},
+    {-2,-1,0,2,1},
+    {-2,0,0,0,1},
+    {0,0,2,2,1},
+    {-2,0,2,0,1},
+    {-2,1,0,2,1},
+    {0,0,1,-2,0},
+    {-1,0,1,0,0},
+    {-2,1,0,0,0},
+    {1,0,0,0,0},
+    {0,0,1,2,0},
+    {0,0,-2,2,2},
+    {-1,-1,1,0,0},
+    {0,1,1,0,0},
+    {0,-1,1,2,2},
+    {2,-1,-1,2,2},
+    {0,0,3,2,2},
+    {2,-1,0,2,2},
 };
 
-const double PE_TERMS[Y_COUNT][TERM_PE_COUNT] = {
-    {-171996, -174.2, 92025, 8.9},
-    {-13187, -1.6, 5736, -3.1},
-    {-2274, -0.2, 977, -0.5},
-    {2062, 0.2, -895, 0.5},
-    {1426, -3.4, 54, -0.1},
-    {712, 0.1, -7, 0},
-    {-517, 1.2, 224, -0.6},
-    {-386, -0.4, 200, 0},
-    {-301, 0, 129, -0.1},
-    {217, -0.5, -95, 0.3},
-    {-158, 0, 0, 0},
-    {129, 0.1, -70, 0},
-    {123, 0, -53, 0},
-    {63, 0, 0, 0},
-    {63, 0.1, -33, 0},
-    {-59, 0, 26, 0},
-    {-58, -0.1, 32, 0},
-    {-51, 0, 27, 0},
-    {48, 0, 0, 0},
-    {46, 0, -24, 0},
-    {-38, 0, 16, 0},
-    {-31, 0, 13, 0},
-    {29, 0, 0, 0},
-    {29, 0, -12, 0},
-    {26, 0, 0, 0},
-    {-22, 0, 0, 0},
-    {21, 0, -10, 0},
-    {17, -0.1, 0, 0},
-    {16, 0, -8, 0},
-    {-16, 0.1, 7, 0},
-    {-15, 0, 9, 0},
-    {-13, 0, 7, 0},
-    {-12, 0, 6, 0},
-    {11, 0, 0, 0},
-    {-10, 0, 5, 0},
-    {-8, 0, 3, 0},
-    {7, 0, -3, 0},
-    {-7, 0, 0, 0},
-    {-7, 0, 3, 0},
-    {-7, 0, 3, 0},
-    {6, 0, 0, 0},
-    {6, 0, -3, 0},
-    {6, 0, -3, 0},
-    {-6, 0, 3, 0},
-    {-6, 0, 3, 0},
-    {5, 0, 0, 0},
-    {-5, 0, 3, 0},
-    {-5, 0, 3, 0},
-    {-5, 0, 3, 0},
-    {4, 0, 0, 0},
-    {4, 0, 0, 0},
-    {4, 0, 0, 0},
-    {-4, 0, 0, 0},
-    {-4, 0, 0, 0},
-    {-4, 0, 0, 0},
-    {3, 0, 0, 0},
-    {-3, 0, 0, 0},
-    {-3, 0, 0, 0},
-    {-3, 0, 0, 0},
-    {-3, 0, 0, 0},
-    {-3, 0, 0, 0},
-    {-3, 0, 0, 0},
-    {-3, 0, 0, 0},
+const double PE_TERMS[Y_COUNT][TERM_PE_COUNT]={
+    {-171996,-174.2,92025,8.9},
+    {-13187,-1.6,5736,-3.1},
+    {-2274,-0.2,977,-0.5},
+    {2062,0.2,-895,0.5},
+    {1426,-3.4,54,-0.1},
+    {712,0.1,-7,0},
+    {-517,1.2,224,-0.6},
+    {-386,-0.4,200,0},
+    {-301,0,129,-0.1},
+    {217,-0.5,-95,0.3},
+    {-158,0,0,0},
+    {129,0.1,-70,0},
+    {123,0,-53,0},
+    {63,0,0,0},
+    {63,0.1,-33,0},
+    {-59,0,26,0},
+    {-58,-0.1,32,0},
+    {-51,0,27,0},
+    {48,0,0,0},
+    {46,0,-24,0},
+    {-38,0,16,0},
+    {-31,0,13,0},
+    {29,0,0,0},
+    {29,0,-12,0},
+    {26,0,0,0},
+    {-22,0,0,0},
+    {21,0,-10,0},
+    {17,-0.1,0,0},
+    {16,0,-8,0},
+    {-16,0.1,7,0},
+    {-15,0,9,0},
+    {-13,0,7,0},
+    {-12,0,6,0},
+    {11,0,0,0},
+    {-10,0,5,0},
+    {-8,0,3,0},
+    {7,0,-3,0},
+    {-7,0,0,0},
+    {-7,0,3,0},
+    {-7,0,3,0},
+    {6,0,0,0},
+    {6,0,-3,0},
+    {6,0,-3,0},
+    {-6,0,3,0},
+    {-6,0,3,0},
+    {5,0,0,0},
+    {-5,0,3,0},
+    {-5,0,3,0},
+    {-5,0,3,0},
+    {4,0,0,0},
+    {4,0,0,0},
+    {4,0,0,0},
+    {-4,0,0,0},
+    {-4,0,0,0},
+    {-4,0,0,0},
+    {3,0,0,0},
+    {-3,0,0,0},
+    {-3,0,0,0},
+    {-3,0,0,0},
+    {-3,0,0,0},
+    {-3,0,0,0},
+    {-3,0,0,0},
+    {-3,0,0,0},
 };
 
 ///////////////////////////////////////////////
 
-static double rad2deg(double radians) {
-    return (180.0 / PI) * radians;
+static double rad2deg(double radians)
+{
+    return (180.0/PI)*radians;
 }
 
-static double deg2rad(double degrees) {
-    return (PI / 180.0) * degrees;
+static double deg2rad(double degrees)
+{
+    return (PI/180.0)*degrees;
 }
 
-static double limit_degrees(double degrees) {
+static double limit_degrees(double degrees)
+{
     double limited;
 
     degrees /= 360.0;
-    limited = 360.0 * (degrees - floor(degrees));
+    limited = 360.0*(degrees-floor(degrees));
     if (limited < 0) limited += 360.0;
 
     return limited;
 }
 
-static double third_order_polynomial(double a, double b, double c, double d, double x) {
-    return ((a * x + b) * x + c) * x + d;
+static double third_order_polynomial(double a, double b, double c, double d, double x)
+{
+    return ((a*x + b)*x + c)*x + d;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-static SpaStatus validate_inputs(spa_data *spa) {
+static int validate_inputs(spa_data *spa)
+{
     // Less than -2000-01-01 00:00 or Greater than 6000-12-31 23:59:59
     if ((spa->jd < 990575.50000) || (spa->jd > 3912880.49999)) return SpaStatus_UnsupportedDate;
 
@@ -455,45 +514,52 @@ static SpaStatus validate_inputs(spa_data *spa) {
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-static double julian_century(double jd) {
-    return (jd - 2451545.0) / 36525.0;
+static double julian_century(double jd)
+{
+    return (jd-2451545.0)/36525.0;
 }
 
-static double julian_ephemeris_day(double jd, double delta_t) {
-    return jd + delta_t / 86400.0;
+static double julian_ephemeris_day(double jd, double delta_t)
+{
+    return jd+delta_t/86400.0;
 }
 
-static double julian_ephemeris_century(double jde) {
-    return (jde - 2451545.0) / 36525.0;
+static double julian_ephemeris_century(double jde)
+{
+    return (jde - 2451545.0)/36525.0;
 }
 
-static double julian_ephemeris_millennium(double jce) {
-    return (jce / 10.0);
+static double julian_ephemeris_millennium(double jce)
+{
+    return (jce/10.0);
 }
 
-static double earth_periodic_term_summation(const double terms[][TERM_COUNT], int count, double jme) {
+static double earth_periodic_term_summation(const double terms[][TERM_COUNT], int count, double jme)
+{
     int i;
-    double sum = 0;
+    double sum=0;
 
     for (i = 0; i < count; i++)
-        sum += terms[i][TERM_A] * cos(terms[i][TERM_B] + terms[i][TERM_C] * jme);
+        sum += terms[i][TERM_A]*cos(terms[i][TERM_B]+terms[i][TERM_C]*jme);
 
     return sum;
 }
 
-static double earth_values(double term_sum[], int count, double jme) {
+static double earth_values(double term_sum[], int count, double jme)
+{
     int i;
-    double sum = 0;
+    double sum=0;
 
     for (i = 0; i < count; i++)
-        sum += term_sum[i] * pow(jme, i);
+        sum += term_sum[i]*pow(jme, i);
 
     sum /= 1.0e8;
 
     return sum;
 }
 
-static double earth_heliocentric_longitude(double jme) {
+static double earth_heliocentric_longitude(double jme)
+{
     double sum[L_COUNT];
     int i;
 
@@ -501,9 +567,11 @@ static double earth_heliocentric_longitude(double jme) {
         sum[i] = earth_periodic_term_summation(L_TERMS[i], l_subcount[i], jme);
 
     return limit_degrees(rad2deg(earth_values(sum, L_COUNT, jme)));
+
 }
 
-static double earth_heliocentric_latitude(double jme) {
+static double earth_heliocentric_latitude(double jme)
+{
     double sum[B_COUNT];
     int i;
 
@@ -511,9 +579,11 @@ static double earth_heliocentric_latitude(double jme) {
         sum[i] = earth_periodic_term_summation(B_TERMS[i], b_subcount[i], jme);
 
     return rad2deg(earth_values(sum, B_COUNT, jme));
+
 }
 
-static double earth_radius_vector(double jme) {
+static double earth_radius_vector(double jme)
+{
     double sum[R_COUNT];
     int i;
 
@@ -521,9 +591,11 @@ static double earth_radius_vector(double jme) {
         sum[i] = earth_periodic_term_summation(R_TERMS[i], r_subcount[i], jme);
 
     return earth_values(sum, R_COUNT, jme);
+
 }
 
-static double geocentric_longitude(double l) {
+static double geocentric_longitude(double l)
+{
     double theta = l + 180.0;
 
     if (theta >= 360.0) theta -= 360.0;
@@ -531,150 +603,174 @@ static double geocentric_longitude(double l) {
     return theta;
 }
 
-static double geocentric_latitude(double b) {
+static double geocentric_latitude(double b)
+{
     return -b;
 }
 
-static double mean_elongation_moon_sun(double jce) {
-    return third_order_polynomial(1.0 / 189474.0, -0.0019142, 445267.11148, 297.85036, jce);
+static double mean_elongation_moon_sun(double jce)
+{
+    return third_order_polynomial(1.0/189474.0, -0.0019142, 445267.11148, 297.85036, jce);
 }
 
-static double mean_anomaly_sun(double jce) {
-    return third_order_polynomial(-1.0 / 300000.0, -0.0001603, 35999.05034, 357.52772, jce);
+static double mean_anomaly_sun(double jce)
+{
+    return third_order_polynomial(-1.0/300000.0, -0.0001603, 35999.05034, 357.52772, jce);
 }
 
-static double mean_anomaly_moon(double jce) {
-    return third_order_polynomial(1.0 / 56250.0, 0.0086972, 477198.867398, 134.96298, jce);
+static double mean_anomaly_moon(double jce)
+{
+    return third_order_polynomial(1.0/56250.0, 0.0086972, 477198.867398, 134.96298, jce);
 }
 
-static double argument_latitude_moon(double jce) {
-    return third_order_polynomial(1.0 / 327270.0, -0.0036825, 483202.017538, 93.27191, jce);
+static double argument_latitude_moon(double jce)
+{
+    return third_order_polynomial(1.0/327270.0, -0.0036825, 483202.017538, 93.27191, jce);
 }
 
-static double ascending_longitude_moon(double jce) {
-    return third_order_polynomial(1.0 / 450000.0, 0.0020708, -1934.136261, 125.04452, jce);
+static double ascending_longitude_moon(double jce)
+{
+    return third_order_polynomial(1.0/450000.0, 0.0020708, -1934.136261, 125.04452, jce);
 }
 
-static double xy_term_summation(int i, double x[TERM_X_COUNT]) {
+static double xy_term_summation(int i, double x[TERM_X_COUNT])
+{
     int j;
-    double sum = 0;
+    double sum=0;
 
     for (j = 0; j < TERM_Y_COUNT; j++)
-        sum += x[j] * Y_TERMS[i][j];
+        sum += x[j]*Y_TERMS[i][j];
 
     return sum;
 }
 
-static void nutation_longitude_and_obliquity(double jce, double x[TERM_X_COUNT], double *del_psi, double *del_epsilon) {
+static void nutation_longitude_and_obliquity(double jce, double x[TERM_X_COUNT], double *del_psi,
+                                                                          double *del_epsilon)
+{
     int i;
-    double xy_term_sum, sum_psi = 0, sum_epsilon = 0;
+    double xy_term_sum, sum_psi=0, sum_epsilon=0;
 
     for (i = 0; i < Y_COUNT; i++) {
-        xy_term_sum = deg2rad(xy_term_summation(i, x));
-        sum_psi += (PE_TERMS[i][TERM_PSI_A] + jce * PE_TERMS[i][TERM_PSI_B]) * sin(xy_term_sum);
-        sum_epsilon += (PE_TERMS[i][TERM_EPS_C] + jce * PE_TERMS[i][TERM_EPS_D]) * cos(xy_term_sum);
+        xy_term_sum  = deg2rad(xy_term_summation(i, x));
+        sum_psi     += (PE_TERMS[i][TERM_PSI_A] + jce*PE_TERMS[i][TERM_PSI_B])*sin(xy_term_sum);
+        sum_epsilon += (PE_TERMS[i][TERM_EPS_C] + jce*PE_TERMS[i][TERM_EPS_D])*cos(xy_term_sum);
     }
 
-    *del_psi = sum_psi / 36000000.0;
+    *del_psi     = sum_psi     / 36000000.0;
     *del_epsilon = sum_epsilon / 36000000.0;
 }
 
-static double ecliptic_mean_obliquity(double jme) {
-    double u = jme / 10.0;
+static double ecliptic_mean_obliquity(double jme)
+{
+    double u = jme/10.0;
 
-    return 84381.448 +
-           u * (-4680.93 +
-                u * (-1.55 +
-                     u * (1999.25 +
-                          u * (-51.38 +
-                               u * (-249.67 + u * (-39.05 + u * (7.12 + u * (27.87 + u * (5.79 + u * 2.45)))))))));
+    return 84381.448 + u*(-4680.93 + u*(-1.55 + u*(1999.25 + u*(-51.38 + u*(-249.67 +
+                       u*(  -39.05 + u*( 7.12 + u*(  27.87 + u*(  5.79 + u*2.45)))))))));
 }
 
-static double ecliptic_true_obliquity(double delta_epsilon, double epsilon0) {
-    return delta_epsilon + epsilon0 / 3600.0;
+static double ecliptic_true_obliquity(double delta_epsilon, double epsilon0)
+{
+    return delta_epsilon + epsilon0/3600.0;
 }
 
-static double aberration_correction(double r) {
-    return -20.4898 / (3600.0 * r);
+static double aberration_correction(double r)
+{
+    return -20.4898 / (3600.0*r);
 }
 
-static double apparent_sun_longitude(double theta, double delta_psi, double delta_tau) {
+static double apparent_sun_longitude(double theta, double delta_psi, double delta_tau)
+{
     return theta + delta_psi + delta_tau;
 }
 
-static double greenwich_mean_sidereal_time(double jd, double jc) {
-    return limit_degrees(280.46061837 + 360.98564736629 * (jd - 2451545.0) + jc * jc * (0.000387933 - jc / 38710000.0));
+static double greenwich_mean_sidereal_time (double jd, double jc)
+{
+    return limit_degrees(280.46061837 + 360.98564736629 * (jd - 2451545.0) +
+                                       jc*jc*(0.000387933 - jc/38710000.0));
 }
 
-static double greenwich_sidereal_time(double nu0, double delta_psi, double epsilon) {
-    return nu0 + delta_psi * cos(deg2rad(epsilon));
+static double greenwich_sidereal_time (double nu0, double delta_psi, double epsilon)
+{
+    return nu0 + delta_psi*cos(deg2rad(epsilon));
 }
 
-static double geocentric_right_ascension(double lamda, double epsilon, double beta) {
-    double lamda_rad = deg2rad(lamda);
+static double geocentric_right_ascension(double lamda, double epsilon, double beta)
+{
+    double lamda_rad   = deg2rad(lamda);
     double epsilon_rad = deg2rad(epsilon);
 
-    return limit_degrees(
-        rad2deg(atan2(sin(lamda_rad) * cos(epsilon_rad) - tan(deg2rad(beta)) * sin(epsilon_rad), cos(lamda_rad))));
+    return limit_degrees(rad2deg(atan2(sin(lamda_rad)*cos(epsilon_rad) -
+                                       tan(deg2rad(beta))*sin(epsilon_rad), cos(lamda_rad))));
 }
 
-static double geocentric_declination(double beta, double epsilon, double lamda) {
-    double beta_rad = deg2rad(beta);
+static double geocentric_declination(double beta, double epsilon, double lamda)
+{
+    double beta_rad    = deg2rad(beta);
     double epsilon_rad = deg2rad(epsilon);
 
-    return rad2deg(asin(sin(beta_rad) * cos(epsilon_rad) + cos(beta_rad) * sin(epsilon_rad) * sin(deg2rad(lamda))));
+    return rad2deg(asin(sin(beta_rad)*cos(epsilon_rad) +
+                        cos(beta_rad)*sin(epsilon_rad)*sin(deg2rad(lamda))));
 }
 
-static double observer_hour_angle(double nu, double longitude, double alpha_deg) {
+static double observer_hour_angle(double nu, double longitude, double alpha_deg)
+{
     return limit_degrees(nu + longitude - alpha_deg);
 }
 
-static double sun_equatorial_horizontal_parallax(double r) {
+static double sun_equatorial_horizontal_parallax(double r)
+{
     return 8.794 / (3600.0 * r);
 }
 
-static void right_ascension_parallax_and_topocentric_dec(
-    double latitude, double elevation, double xi, double h, double delta, double *delta_alpha, double *delta_prime) {
+static void right_ascension_parallax_and_topocentric_dec(double latitude, double elevation,
+	       double xi, double h, double delta, double *delta_alpha, double *delta_prime)
+{
     double delta_alpha_rad;
-    double lat_rad = deg2rad(latitude);
-    double xi_rad = deg2rad(xi);
-    double h_rad = deg2rad(h);
+    double lat_rad   = deg2rad(latitude);
+    double xi_rad    = deg2rad(xi);
+    double h_rad     = deg2rad(h);
     double delta_rad = deg2rad(delta);
     double u = atan(0.99664719 * tan(lat_rad));
-    double y = 0.99664719 * sin(u) + elevation * sin(lat_rad) / 6378140.0;
-    double x = cos(u) + elevation * cos(lat_rad) / 6378140.0;
+    double y = 0.99664719 * sin(u) + elevation*sin(lat_rad)/6378140.0;
+    double x =              cos(u) + elevation*cos(lat_rad)/6378140.0;
 
-    delta_alpha_rad = atan2(-x * sin(xi_rad) * sin(h_rad), cos(delta_rad) - x * sin(xi_rad) * cos(h_rad));
+    delta_alpha_rad =      atan2(                - x*sin(xi_rad) *sin(h_rad),
+                                  cos(delta_rad) - x*sin(xi_rad) *cos(h_rad));
 
-    *delta_prime = rad2deg(atan2((sin(delta_rad) - y * sin(xi_rad)) * cos(delta_alpha_rad),
-                                 cos(delta_rad) - x * sin(xi_rad) * cos(h_rad)));
+    *delta_prime = rad2deg(atan2((sin(delta_rad) - y*sin(xi_rad))*cos(delta_alpha_rad),
+                                  cos(delta_rad) - x*sin(xi_rad) *cos(h_rad)));
 
     *delta_alpha = rad2deg(delta_alpha_rad);
 }
 
-static double topocentric_local_hour_angle(double h, double delta_alpha) {
+static double topocentric_local_hour_angle(double h, double delta_alpha)
+{
     return h - delta_alpha;
 }
 
-static double topocentric_elevation_angle(double latitude, double delta_prime, double h_prime) {
-    double lat_rad = deg2rad(latitude);
+static double topocentric_elevation_angle(double latitude, double delta_prime, double h_prime)
+{
+    double lat_rad         = deg2rad(latitude);
     double delta_prime_rad = deg2rad(delta_prime);
 
-    return rad2deg(
-        asin(sin(lat_rad) * sin(delta_prime_rad) + cos(lat_rad) * cos(delta_prime_rad) * cos(deg2rad(h_prime))));
+    return rad2deg(asin(sin(lat_rad)*sin(delta_prime_rad) +
+                        cos(lat_rad)*cos(delta_prime_rad) * cos(deg2rad(h_prime))));
 }
 
-static double atmospheric_refraction_correction(double pressure, double temperature, double atmos_refract, double e0) {
+static double atmospheric_refraction_correction(double pressure, double temperature,
+	                                     double atmos_refract, double e0)
+{
     double del_e = 0;
 
-    if (e0 >= -1 * (SUN_RADIUS + atmos_refract))
-        del_e = (pressure / 1010.0) * (283.0 / (273.0 + temperature)) * 1.02 /
-                (60.0 * tan(deg2rad(e0 + 10.3 / (e0 + 5.11))));
+    if (e0 >= -1*(SUN_RADIUS + atmos_refract))
+        del_e = (pressure / 1010.0) * (283.0 / (273.0 + temperature)) *
+                 1.02 / (60.0 * tan(deg2rad(e0 + 10.3/(e0 + 5.11))));
 
     return del_e;
 }
 
-static double topocentric_elevation_angle_corrected(double e0, double delta_e) {
+static double topocentric_elevation_angle_corrected(double e0, double delta_e)
+{
     return e0 + delta_e;
 }
 
@@ -682,7 +778,8 @@ static double topocentric_elevation_angle_corrected(double e0, double delta_e) {
 // Calculate required SPA parameters to get the right ascension (alpha) and declination (delta)
 // Note: JD must be already calculated and in structure
 ////////////////////////////////////////////////////////////////////////////////////////////////
-void calculate_geocentric_sun_right_ascension_and_declination(spa_data *spa) {
+void calculate_geocentric_sun_right_ascension_and_declination(spa_data *spa)
+{
     double x[TERM_X_COUNT];
 
     spa->jc = julian_century(spa->jd);
@@ -696,7 +793,7 @@ void calculate_geocentric_sun_right_ascension_and_declination(spa_data *spa) {
     spa->r = earth_radius_vector(spa->jme);
 
     spa->theta = geocentric_longitude(spa->l);
-    spa->beta = geocentric_latitude(spa->b);
+    spa->beta  = geocentric_latitude(spa->b);
 
     x[TERM_X0] = spa->x0 = mean_elongation_moon_sun(spa->jce);
     x[TERM_X1] = spa->x1 = mean_anomaly_sun(spa->jce);
@@ -707,12 +804,12 @@ void calculate_geocentric_sun_right_ascension_and_declination(spa_data *spa) {
     nutation_longitude_and_obliquity(spa->jce, x, &(spa->del_psi), &(spa->del_epsilon));
 
     spa->epsilon0 = ecliptic_mean_obliquity(spa->jme);
-    spa->epsilon = ecliptic_true_obliquity(spa->del_epsilon, spa->epsilon0);
+    spa->epsilon  = ecliptic_true_obliquity(spa->del_epsilon, spa->epsilon0);
 
-    spa->del_tau = aberration_correction(spa->r);
-    spa->lamda = apparent_sun_longitude(spa->theta, spa->del_psi, spa->del_tau);
-    spa->nu0 = greenwich_mean_sidereal_time(spa->jd, spa->jc);
-    spa->nu = greenwich_sidereal_time(spa->nu0, spa->del_psi, spa->epsilon);
+    spa->del_tau   = aberration_correction(spa->r);
+    spa->lamda     = apparent_sun_longitude(spa->theta, spa->del_psi, spa->del_tau);
+    spa->nu0       = greenwich_mean_sidereal_time (spa->jd, spa->jc);
+    spa->nu        = greenwich_sidereal_time (spa->nu0, spa->del_psi, spa->epsilon);
 
     spa->alpha = geocentric_right_ascension(spa->lamda, spa->epsilon, spa->beta);
     spa->delta = geocentric_declination(spa->beta, spa->epsilon, spa->lamda);
@@ -722,25 +819,28 @@ void calculate_geocentric_sun_right_ascension_and_declination(spa_data *spa) {
 // Calculate all SPA parameters and put into structure
 // Note: All inputs values (listed in header file) must already be in structure
 ///////////////////////////////////////////////////////////////////////////////////////////
-SpaStatus spa_calculate(spa_data *spa) {
+SpaStatus spa_calculate(spa_data *spa)
+{
     SpaStatus result;
 
     result = validate_inputs(spa);
 
-    if (result == SpaStatus_Success) {
+    if (result == SpaStatus_Success)
+    {
         calculate_geocentric_sun_right_ascension_and_declination(spa);
 
-        spa->h = observer_hour_angle(spa->nu, spa->longitude, spa->alpha);
+        spa->h  = observer_hour_angle(spa->nu, spa->longitude, spa->alpha);
         spa->xi = sun_equatorial_horizontal_parallax(spa->r);
 
-        right_ascension_parallax_and_topocentric_dec(
-            spa->latitude, spa->elevation, spa->xi, spa->h, spa->delta, &(spa->del_alpha), &(spa->delta_prime));
+        right_ascension_parallax_and_topocentric_dec(spa->latitude, spa->elevation, spa->xi,
+                                spa->h, spa->delta, &(spa->del_alpha), &(spa->delta_prime));
 
-        spa->h_prime = topocentric_local_hour_angle(spa->h, spa->del_alpha);
+        spa->h_prime     = topocentric_local_hour_angle(spa->h, spa->del_alpha);
 
-        spa->e0 = topocentric_elevation_angle(spa->latitude, spa->delta_prime, spa->h_prime);
-        spa->del_e = atmospheric_refraction_correction(spa->pressure, spa->temperature, spa->atmos_refract, spa->e0);
-        spa->e = topocentric_elevation_angle_corrected(spa->e0, spa->del_e);
+        spa->e0      = topocentric_elevation_angle(spa->latitude, spa->delta_prime, spa->h_prime);
+        spa->del_e   = atmospheric_refraction_correction(spa->pressure, spa->temperature,
+                                                         spa->atmos_refract, spa->e0);
+        spa->e       = topocentric_elevation_angle_corrected(spa->e0, spa->del_e);
     }
 
     return result;
