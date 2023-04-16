@@ -1,7 +1,11 @@
-All code written by Jacob Halsey is distributed under the LGPL-3.0 license
+This software contains code licensed by NREL in the following files:
 
-https://www.gnu.org/licenses/lgpl-3.0.txt
+- spa.c
+- spa.h
+- spa_tester.c
 
-src/spa.c is controlled by the NREL license
+See https://midcdmz.nrel.gov/spa/
 
-https://midcdmz.nrel.gov/spa/
+All non-NREL code is distributed under the LGPL-3.0 license
+
+See https://www.gnu.org/licenses/lgpl-3.0.txt
