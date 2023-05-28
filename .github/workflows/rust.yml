@@ -16,6 +16,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Set git to checkout as is, commit LF
+        run: git config --global core.autocrlf input
+
       - name: Cargo Test
         run: cargo test -- --nocapture
         working-directory: ./rust
