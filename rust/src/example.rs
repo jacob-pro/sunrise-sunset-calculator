@@ -2,8 +2,6 @@ use anyhow::anyhow;
 use chrono::{Local, TimeZone};
 use clap::Parser;
 use geocoding::{Forward, Openstreetmap};
-// The way in which we link to this is important
-// https://stackoverflow.com/a/64366809/7547647
 use sunrise_sunset_calculator::*;
 
 #[derive(Parser)]
@@ -46,7 +44,7 @@ fn main() -> Result<(), anyhow::Error> {
         None => Local::now().timestamp(),
         Some(t) => Local.datetime_from_str(&t, "%Y-%m-%d %H:%M")?.timestamp(),
     };
-    println!("Using time: {}", time);
+    println!("Using timestamp: {}", time);
 
     let coords = match opts.location {
         Location::Coords(c) => c,
@@ -66,11 +64,11 @@ fn main() -> Result<(), anyhow::Error> {
         coords.latitude, coords.longitude
     );
 
-    let r = SscInput::new(time, coords.latitude, coords.longitude).compute()?;
+    let r = SunriseSunsetParameters::new(time, coords.latitude, coords.longitude).calculate()?;
     println!("Visible: {}", r.visible);
 
-    let set = Local.timestamp(r.set, 0);
-    let rise = Local.timestamp(r.rise, 0);
+    let set = Local.timestamp_opt(r.set, 0).unwrap();
+    let rise = Local.timestamp_opt(r.rise, 0).unwrap();
 
     if r.visible {
         println!(

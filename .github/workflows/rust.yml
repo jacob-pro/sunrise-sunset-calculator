@@ -4,7 +4,6 @@ on: [push, pull_request]
 
 env:
   CARGO_TERM_COLOR: always
-  IMAGE_NAME: mdbook-bibfile-referencing
 
 jobs:
 
@@ -15,30 +14,23 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
+      - name: Set git to checkout as is, commit LF
+        run: git config --global core.autocrlf input
+
       - uses: actions/checkout@v2
 
       - name: Cargo Test
         run: cargo test -- --nocapture
-        working-directory: ./rust-bindings
-
-      - name: no_std
-        if: ${{ matrix.os != 'macos-latest' }}
-        run: cargo build --no-default-features
-        working-directory: ./rust-bindings
-
-  check_style:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Cargo Format Check
-        run: cargo fmt -- --check
-        working-directory: ./rust-bindings
-
-      - name: Cargo Sort Check
-        run: cargo install cargo-sort && cargo-sort --check
-        working-directory: ./rust-bindings
+        working-directory: ./rust
 
       - name: Cargo Clippy Check
         run: cargo clippy --all-features --workspace -- -D warnings
-        working-directory: ./rust-bindings
+        working-directory: ./rust
+
+      - name: Cargo Format Check
+        run: cargo fmt -- --check
+        working-directory: ./rust
+
+      - name: Cargo Sort Check
+        run: cargo install cargo-sort --debug && cargo-sort --check
+        working-directory: ./rust
