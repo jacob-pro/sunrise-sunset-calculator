@@ -777,7 +777,7 @@ static double topocentric_elevation_angle_corrected(double e0, double delta_e)
 // Calculate required SPA parameters to get the right ascension (alpha) and declination (delta)
 // Note: JD must be already calculated and in structure
 ////////////////////////////////////////////////////////////////////////////////////////////////
-void calculate_geocentric_sun_right_ascension_and_declination(spa_data *spa)
+static void calculate_geocentric_sun_right_ascension_and_declination(spa_data *spa)
 {
     double x[TERM_X_COUNT];
 
