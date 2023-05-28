@@ -14,10 +14,10 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - uses: actions/checkout@v2
-
       - name: Set git to checkout as is, commit LF
         run: git config --global core.autocrlf input
+
+      - uses: actions/checkout@v2
 
       - name: Cargo Test
         run: cargo test -- --nocapture
