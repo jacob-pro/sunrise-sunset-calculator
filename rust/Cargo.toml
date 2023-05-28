@@ -11,7 +11,6 @@ description = "Sunrise sunset calculator for Rust"
 [dependencies]
 thiserror = "1.0.40"
 
-
 [dev-dependencies]
 anyhow = "1.0"
 approx = "0.5.1"
