@@ -2,7 +2,7 @@
 
 [![Build status](https://github.com/jacob-pro/sunrise-sunset-calculator/actions/workflows/rust.yml/badge.svg)](https://github.com/jacob-pro/sunrise-sunset-calculator/actions/workflows/rust.yml)
 [![crates.io](https://img.shields.io/crates/v/sunrise-sunset-calculator.svg)](https://crates.io/crates/sunrise-sunset-calculator)
-[![docs.rs](https://docs.rs/sunrise-sunset-calculator/badge.svg)](https://docs.rs/crate/sunrise-sunset-calculator)
+[![docs.rs](https://docs.rs/sunrise-sunset-calculator/badge.svg)](https://docs.rs/sunrise-sunset-calculator/latest/sunrise_sunset_calculator/)
 
 A crate for computing sunrise and sunset times.
 
